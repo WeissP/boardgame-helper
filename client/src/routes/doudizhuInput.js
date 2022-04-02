@@ -12,7 +12,7 @@ const DouDiZhuInput = () => {
     const [winner, setWinner] = React.useState('')
     const [weight, setWeight] = React.useState({})
     const [lord, setLord] = React.useState('')
-    const [stake, setStake] = React.useState(0)
+    const [stake, setStake] = React.useState(1)
     const [bonusTiles, setBonusTiles] = React.useState(3)
 
     function handleSubmit(event) {
