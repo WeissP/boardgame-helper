@@ -1,0 +1,299 @@
+* Name
+* purposal
+** score tracker
+*** mahjong
+**** 斗地主
+
+***** input
+#+begin_src json
+{
+    "players":["bai","xiao","jintian","yunfan"]     ,     // id, clockwise
+    "winner":[0],                 // int
+    "weight":[-1,1,-3,3]  // int, for winner, sum = 0
+    "lord":0 ,                  // int
+    "points":20, // raw points 
+    "stake": 2,
+    "timestamp": "2022-03-29 17:45",
+    "bonus-tiles":8
+}
+#+end_src
+****** case 1
+
+jintian
+bai          xiao           
+yunfan
+winner=0
+lord=1
+points=88
+stake=3
+weight:[2,-6,2,2]
+
+bai 和了 yunfan ，各吃 jintian 和 yunfan 一口
+
+****** case 2
+"players":["bai","xiao","jintian","yunfan"]     ,     // id
+
+jintian
+bai          xiao           
+yunfan
+winner=0
+lord=1
+points=88
+stake=3
+weight:[3,-6,2,1]
+
+bai 和了 xiao ，各吃 jintian 和 yunfan 一口
+
+***** output
+
+#+begin_src json
+{
+    "isSuccess":true,
+    "success":{
+        "players":["bai","xiao","jintian","yunfan"]     ,     // id
+        "scores":[1,5,40, -46] // int
+    },
+    "error":{
+        "msg":"asdf"
+    }    
+}
+#+end_src
+
+
+****** success
+#+begin_src json
+{
+    "players":["bai","xiao","jintian","yunfan"]     ,     // id
+    "scores":[1,5,40, -46] // int
+}
+#+end_src
+
+****** error
+
+#+begin_src json
+{
+    "msg":"asdf"
+}
+#+end_src
+
+** tools
+*** 日麻
+**** 算符娘
+***** input
+
+#+begin_src json
+{
+    "yi main ting": true,
+    "men qing": true,
+    "que tou": {
+        "zi feng": true,
+        "chang feng": true,
+        "san yuan": true
+    },
+    "mian zi": [
+        {
+        "ke zi": true,
+        "yi jiu": true,
+        "ming": true
+    }
+    ]
+}
+#+end_src
+***** output
+#+begin_src json
+{"fu":0}
+#+end_src
+
+**** 算分娘
+
+***** input
+
+#+begin_src json
+{
+    "fu":20,
+    "fan":5,
+    "zhuang":true,
+    "lian zhuang":0,    
+}
+#+end_src
+
+***** output
+
+#+begin_src json
+{"fen":[,2000]}
+#+end_src
+
+** history
+
+*** function
+
+**** point
+
+|-----+-------+-----+-----+-----+-----|
+|     | Total | Win | Max | Min | Avg |
+|-----+-------+-----+-----+-----+-----|
+| bai |       |     |     |     |     |
+|-----+-------+-----+-----+-----+-----|
+
+**** misc
+
+bai:
+
+|---------+---------+------------+-----------+------------+----------|
+|         | percent | avg points | avg stake | avg weight | win rate |
+|---------+---------+------------+-----------+------------+----------|
+| lord    |         |            |           |            |          |
+| defense |         |            |           |            |          |
+| support |         |            |           |            |          |
+| carry   |         |            |           |            |          |
+|---------+---------+------------+-----------+------------+----------|
+
+*** json
+
+#+begin_src json
+{
+    "player":"bai"
+    "points":55, // int
+    "position":"lord", // one of the following: lord, defense, support, carry
+    "timestamp": "2022-03-29 17:45",
+    "stake": 2,
+    "weight":3,
+    "is winner":true, // the person that hu's
+}
+#+end_src
+** users
+
+#+begin_src json
+{
+    "name": 白,
+    "id":bai    
+}
+#+end_src
+* api
+** doudizhu
+*** view /Get/
+
+#+begin_src json
+{
+  "playerNames": [
+    "白",
+    "肖",
+    "锦添",
+    "云帆"
+  ],
+  "deltaScores": [
+    {
+      "timestamp": "2022-03-31T14:29:06.480Z",
+      "enabled": true,
+      "delta": [
+        20,
+        8,
+        8,
+        -36
+      ]
+    },
+    {
+      "timestamp": "2022-03-31T14:55:06.480Z",
+      "enabled": false,
+      "delta": [
+        40,
+        8,
+        8,
+        -56
+      ]
+    }
+  ],
+  "finalScores": [
+    1,
+    2,
+    3,
+    -4
+  ]
+}
+#+end_src
+
+objects in scores are sorted from oldest to newest
+
+**** now
+**** date/{timestamp}
+
+ignore the time, only check the date in correct timezone
+*** disable  /Get/
+
+**** input
+
+timestamp
+**** output
+#+begin_src json
+{
+  "success": true,
+  "view": "same to view/date/{timestamp}",
+  "error": "error message"
+}
+#+end_src
+
+*** enable  /Get/
+
+**** input
+
+timestamp
+**** output
+#+begin_src json
+{
+  "success": true,
+  "view": "same to view/date/{timestamp}",
+  "error": "error message"
+}
+#+end_src
+
+*** new /Post/
+
+**** input
+#+begin_src json
+{
+  "players": [
+    "bai",
+    "xiao",
+    "jintian",
+    "yunfan"
+  ],
+  "winner": "bai",
+  "weight": {
+    "bai": "2",
+    "xiao": "2",
+    "jintian": "2",
+    "yunfan": "-6"
+  },
+  "points": "8",
+  "stake": "2",
+  "bonusTiles": "5",
+  "lord": "bai",
+  "timestamp": "2022-04-01T15:41:51.523Z"
+}
+#+end_src
+
+**** output
+
+#+begin_src json
+{
+  "success": true,
+  "error": "error message"
+}
+#+end_src
+** players /Get/
+
+
+#+begin_src json
+{
+    "bai":"白",
+    "xiao":"肖",
+    "yunfan":"云帆",
+    "jintian":"锦添"
+}
+#+end_src
+
+
+** type
+*** timestamp
+
+Example timestamp: 2014-03-12T13:37:27+00:00

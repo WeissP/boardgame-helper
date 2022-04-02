@@ -1,0 +1,27 @@
+{
+  "players": [
+    "xiao",
+    "bai",
+    "yunfan",
+    "jintian"
+  ],
+  "winner": "xiao",
+  "weight": {
+    "xiao": "3",
+    "bai": "-5",
+    "yunfan": "0",
+    "jintian": "2"
+  },
+  "lord": 0,
+  "points": "18",
+  "stake": "4",
+  "bonus_tiles": "11",
+  "final_points": {
+    "bai": "-99",
+    "xiao": "53",
+    "jintian": "-8",
+    "yunfan": "-8"
+  },
+  "Lord": "bai",
+  "timestamp": "2022-03-31T15:06:25.679Z"
+}
