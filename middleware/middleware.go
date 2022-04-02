@@ -10,9 +10,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func GetScore(w http.ResponseWriter, r *http.Request) {
-}
-
 func Constant(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	fmt.Printf("point:%v\n", vars["point"])
@@ -27,4 +24,8 @@ func Save(w http.ResponseWriter, r *http.Request) {
 	}
 	t := time.Now()
 	json.WriteNew(reqBody, "history", t.Format("Mon_Jan_2_2006"), t.Format("15:04:05_Jan_2_2006")+".json")
+}
+
+type Msg struct {
+
 }
