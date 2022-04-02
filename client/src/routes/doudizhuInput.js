@@ -50,7 +50,7 @@ const DouDiZhuInput = () => {
                     <div />
                 </div>
                 <div class='mt-2 pb-4 max-w-sm'>
-                    <InputNumber prefix='Stake' value={stake} onChange={(n, _) => setStake(n)} min={0} />
+                    <InputNumber prefix='Stake' value={stake} onChange={(n, _) => setStake(n)} min={1} />
                     <br />
                     <InputNumber prefix='Tiles' value={bonusTiles} onChange={(n, _) => setBonusTiles(n)} min={3} />
                     <br />
