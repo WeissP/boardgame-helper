@@ -13,9 +13,22 @@ import (
 // the path of directory "data"
 var root string
 
+func From(s any) ([]byte, error) {
+	return json.Marshal(s)
+}
+
+func Parse[T any](b []byte) (t T, err error) {
+	err = json.Unmarshal(b, &t)
+	return
+}
+
+func ParseWithDft(b []byte, t any) error {
+	return json.Unmarshal(b, t)
+}
+
 func InitConfig(configJson, dftHost, dftPort string) (host, port string) {
 	config := struct{ Host, Port, Dir string }{dftHost, dftPort, ""}
-	err := json.Unmarshal([]byte(configJson), &config)
+	err := ParseWithDft([]byte(configJson), &config)
 	if err != nil {
 		panic(fmt.Errorf("Config JSON file is invalid:%w", err))
 	}
@@ -28,7 +41,7 @@ func InitConfig(configJson, dftHost, dftPort string) (host, port string) {
 	}
 	fmt.Printf("The data dir is:%v\n", root)
 
-	clientJson, err := json.Marshal(config)
+	clientJson, err := From(config)
 	if err != nil {
 		panic(fmt.Errorf("can not marshal clientJson:%w", err))
 	}
@@ -43,8 +56,7 @@ func ReadFile[T any](pathSegments ...string) (res T, err error) {
 	if err != nil {
 		return
 	}
-	err = json.Unmarshal(data, &res)
-	return
+	return Parse[T](data)
 }
 
 func ReadDir[T any](pathSegments ...string) (res []T, err error) {

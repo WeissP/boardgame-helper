@@ -1,7 +1,7 @@
 package main
 
 import (
-	"boardgame-helper/json"
+	"boardgame-helper/utils/json"
 	"boardgame-helper/router"
 	"fmt"
 	"log"

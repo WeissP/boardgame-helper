@@ -1,0 +1,9 @@
+# github.com/gorilla/mux v1.8.0
+## explicit; go 1.12
+github.com/gorilla/mux
+# github.com/relvacode/iso8601 v1.1.0
+## explicit; go 1.13
+github.com/relvacode/iso8601
+# github.com/rs/cors v1.8.2
+## explicit; go 1.13
+github.com/rs/cors
