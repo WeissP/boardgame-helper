@@ -1,17 +1,85 @@
 * api
+** notation
+=endpoint=
+[type]
+_key of JSON_
+
 ** doudizhu
 *** =view= /Get/
 
 **** =now=
 no input
+***** output
+
+[view]
+
+
 
 **** =date=
 
 ***** input 
-ts: timestamp
+
+_timestamp_: [timestamp]
+
 ignore the time, only check the date in correct timezone
 
+***** output
+
+[view]
+
+
+*** =disable=  /Get/
+
+**** input
+
+_timestamp_: [timestamp]
+
 **** output
+
+[view]
+
+*** =enable=  /Get/
+
+**** input
+
+_timestamp_: timestamp
+**** output
+
+[view]
+
+*** =new= /Post/
+
+**** input
+
+[input]
+
+**** output
+
+no output
+
+*** =edit= /Get/
+
+**** input
+
+_timestamp_: [timestamp]
+
+**** output
+
+[input]
+
+** =players= /Get/
+no input
+
+*** output
+
+[players]
+
+** type
+*** timestamp
+
+Example timestamp: 2014-03-12T13:37:27+00:00
+*** view
+
 #+begin_src json
 {
   "playerNames": [
@@ -63,41 +131,10 @@ ignore the time, only check the date in correct timezone
 }
 #+end_src
 
-objects in scores are sorted from oldest to newest
+objects in deltaScores are sorted from oldest to newest
 
-*** =disable=  /Get/
+*** input
 
-**** input
-
-ts: timestamp
-
-**** output
-
-#+begin_src json
-{
-  "success": true,
-  "view": "same to view/date?ts={timestamp}",
-  "error": "error message"
-}
-#+end_src
-
-*** =enable=  /Get/
-
-**** input
-
-ts: timestamp
-**** output
-#+begin_src json
-{
-  "success": true,
-  "view": "same to view/date/{timestamp}",
-  "error": "error message"
-}
-#+end_src
-
-*** =new= /Post/
-
-**** input
 #+begin_src json
 {
   "players": [
@@ -121,19 +158,8 @@ ts: timestamp
 }
 #+end_src
 
-**** output
+*** players
 
-#+begin_src json
-{
-  "success": true,
-  "error": "error message"
-}
-#+end_src
-** =players= /Get/
-no input
-
-
-*** output
 #+begin_src json
 {
     "bai":"白",
@@ -142,7 +168,3 @@ no input
     "jintian":"锦添"
 }
 #+end_src
-** type
-*** timestamp
-
-Example timestamp: 2014-03-12T13:37:27+00:00
