@@ -3,12 +3,12 @@ import axios from 'axios'
 
 const url = 'http://' + data.Host + ':' + data.Port + '/api/'
 
-export default function post(endpoint, data) {
-    axios.post(url + endpoint, data)
+export function post(endpoint, data) {
+    return axios.post(url + endpoint, data)
 }
 
 export function get(endpoint, data) {
-    axios.post(url + endpoint, data)
+    return axios.get(url + endpoint, { params: data })
 }
 
 // class TestV extends React.Component {

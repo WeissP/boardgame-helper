@@ -1,19 +1,30 @@
 import '../App.css'
 import React from 'react'
-import post from '../common/api'
+import {post} from '../common/api'
 import { PlayerList, INum, UserList } from '../common/input'
 import { InputNumber, Button } from 'rsuite'
 import Header from '../navbar/navbar'
 import { playerValue, playersArray } from '../common/players'
 
-const DouDiZhuInput = () => {
-    const [players, setPlayers] = React.useState(['unknown', 'unknown', 'unknown', 'unknown'])
-    const [points, setPoints] = React.useState(8)
-    const [winner, setWinner] = React.useState('')
-    const [weight, setWeight] = React.useState({})
-    const [lord, setLord] = React.useState('')
-    const [stake, setStake] = React.useState(0)
-    const [bonusTiles, setBonusTiles] = React.useState(3)
+const defaultOption = {
+    players: ['unknown', 'unknown', 'unknown', 'unknown'],
+    points: 8,
+    winner: '',
+    weight: {},
+    lord: '',
+    stake: 0,
+    bonusTiles: 3,
+    timestamp: ''
+}
+
+const DouDiZhuInput = ({ option }) => {
+    const [players, setPlayers] = React.useState(option.players)
+    const [points, setPoints] = React.useState(option.points)
+    const [winner, setWinner] = React.useState(option.winner)
+    const [weight, setWeight] = React.useState(option.weight)
+    const [lord, setLord] = React.useState(option.lord)
+    const [stake, setStake] = React.useState(option.stake)
+    const [bonusTiles, setBonusTiles] = React.useState(option.bonusTiles)
 
     function handleSubmit(event) {
         const res = {
@@ -24,7 +35,7 @@ const DouDiZhuInput = () => {
             lord: lord,
             stake: stake,
             bonusTiles: bonusTiles,
-            timestamp: new Date().toISOString()
+            timestamp: option.timestamp == '' ? new Date().toISOString() : option.timestamp
         }
         console.log(res)
         post('save', res)
@@ -85,4 +96,6 @@ const DouDiZhuInput = () => {
     )
 }
 
-export default DouDiZhuInput
+const DouDiZhuInputDft = () => <DouDiZhuInput option={defaultOption} />
+
+export { DouDiZhuInput, DouDiZhuInputDft, defaultOption }

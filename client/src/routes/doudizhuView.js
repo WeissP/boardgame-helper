@@ -11,7 +11,7 @@ import {
 import '../App.css'
 import Header from '../navbar/navbar'
 import data from './data.json'
-import { playerIDs, playerNames, playersArray } from '../common/players'
+import { get } from '../common/api'
 
 function enable(timestamp) {
     console.log('enable:' + timestamp)
@@ -65,6 +65,15 @@ const EnabledItem = ({ deltas, readOnly, timestamp, rnd }) => {
 function DouDiZhuView() {
     const [hideDisabled, setHide] = React.useState(true)
     const [readOnly, setReadOnly] = React.useState(true)
+
+    get('test/int', { number: 2 }).then((response) => {
+        console.log('res:' + response.data.Num)
+    }).catch(function(error) {
+        if (error.response) {
+            console.log(error.response.data)
+            console.log(error.response.status)
+        }
+    })
 
     const toggleVisible = () => {
         if (hideDisabled) {

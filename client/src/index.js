@@ -8,14 +8,14 @@ import {
     Routes,
     Route
 } from 'react-router-dom'
-import DouDiZhuInput from './routes/doudizhuInput'
+import { DouDiZhuInputDft } from './routes/doudizhuInput'
 import DouDiZhuView from './routes/doudizhuView'
 
 ReactDOM.render(
     <BrowserRouter>
         <Routes>
             <Route path='/' element={<DouDiZhuView />} />
-            <Route path='doudizhu-input' element={<DouDiZhuInput />} />
+            <Route path='doudizhu-input' element={<DouDiZhuInputDft />} />
             <Route path='doudizhu-view' element={<DouDiZhuView />} />
         </Routes>
     </BrowserRouter>,
