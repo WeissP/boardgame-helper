@@ -12,7 +12,7 @@ const defaultOption = {
     winner: '',
     weight: {},
     lord: '',
-    stake: 0,
+    stake: 1,
     bonusTiles: 3,
     timestamp: ''
 }
