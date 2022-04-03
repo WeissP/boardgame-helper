@@ -9,8 +9,8 @@ import (
 
 func Router() *mux.Router {
 	r := mux.NewRouter()
-	r.HandleFunc("/api/test/point/{point}", handler.Wrap(middleware.Constant))
-	r.HandleFunc("/api/test/int", handler.Wrap(middleware.OnlyInt))
-	r.HandleFunc("/api/save", handler.Wrap(middleware.Save))
+	r.HandleFunc("/api/test/point/{point}", handler.Wrap(middleware.PointTest))
+	r.HandleFunc("/api/test/int", handler.Wrap(middleware.OnlyIntTest))
+	r.HandleFunc("/api/save", handler.Wrap(middleware.SaveTest))
 	return r
 }

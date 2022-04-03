@@ -1,7 +1,7 @@
 package players
 
-type Players map[string]string
+var playerMap map[string]string
 
-func Import(){
+func Import() {
 	// update players
 }

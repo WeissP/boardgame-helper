@@ -13,14 +13,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func Constant(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
+func PointTest(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	vars := mux.Vars(r)
 	fmt.Printf("point:%v\n", vars["point"])
 	w.Write([]byte(`{"point123":"` + vars["point"] + `"}`))
 	return
 }
 
-func Save(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
+func SaveTest(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	fmt.Println("new")
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -31,12 +31,7 @@ func Save(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	return
 }
 
-func OnlyInt(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
-	reqBody, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return handler.CommonErr(err, "can not parse request")
-	}
-	fmt.Printf("reqBody:%v\n", reqBody)
+func OnlyIntTest(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	fmt.Println("only int")
 	r.ParseForm()
 	num := r.Form.Get("number")
