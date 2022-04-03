@@ -1,8 +1,11 @@
 * api
 ** notation
+
 =endpoint=
+
 [type]
-_key of JSON_
+
+<key of JSON>
 
 ** doudizhu
 *** =view= /Get/
@@ -19,7 +22,7 @@ no input
 
 ***** input 
 
-_timestamp_: [timestamp]
+<timestamp>: [timestamp]
 
 ignore the time, only check the date in correct timezone
 
@@ -32,7 +35,7 @@ ignore the time, only check the date in correct timezone
 
 **** input
 
-_timestamp_: [timestamp]
+<timestamp>: [timestamp]
 
 **** output
 
@@ -42,7 +45,6 @@ _timestamp_: [timestamp]
 
 **** input
 
-_timestamp_: timestamp
 **** output
 
 [view]
@@ -61,7 +63,7 @@ no output
 
 **** input
 
-_timestamp_: [timestamp]
+<timestamp>: [timestamp]
 
 **** output
 
