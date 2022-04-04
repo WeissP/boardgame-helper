@@ -8,16 +8,16 @@ import (
 	"time"
 )
 
-type DeltaPoint struct {
+type DeltaPointsItem struct {
 	Round     int    `json:"round"`
 	Timestamp string `json:"timestamp"`
 	Enabled   bool   `json:"enabled"`
-	Deltas    []int  `json:"deltas"`
+	Deltas    [4]int `json:"deltas"`
 }
 type view struct {
-	PlayerNames []string     `json:"playerNames"`
-	DeltaPoints []DeltaPoint `json:"deltaPoints"`
-	FinalPoints []int        `json:"finalPoints"`
+	PlayerNames [4]string          `json:"playerNames"`
+	DeltaPoints [4]DeltaPointsItem `json:"deltaPoints"`
+	FinalPoints [4]int             `json:"finalPoints"`
 }
 
 func JsonToStruct() view {

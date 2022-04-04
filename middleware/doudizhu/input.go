@@ -11,7 +11,7 @@ type inputItem struct {
 	Timestamp  string         `json:"timestamp"`
 	Stake      int            `json:"stake"`
 	BonusTiles int            `json:"bonusTiles"`
-	Players    []string       `json:"players"`
+	Players    [4]string      `json:"players"`
 	Points     int            `json:"points"`
 	Winner     string         `json:"winner"`
 	Weight     map[string]int `json:"weight"`
@@ -19,7 +19,7 @@ type inputItem struct {
 }
 
 func TestInput() string {
-	TestStruct := inputItem{"20220405...", 8, 3, []string{"bai", "xiao", "jintian", "yunfan"}, 88, "bai", map[string]int{"bai": 1}, "bai"}
+	TestStruct := inputItem{"20220405...", 8, 3, [4]string{"bai", "xiao", "jintian", "yunfan"}, 88, "bai", map[string]int{"bai": 1}, "bai"}
 	item, err := json.From(TestStruct)
 	if err != nil {
 		panic(err)
