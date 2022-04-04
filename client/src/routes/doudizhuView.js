@@ -116,7 +116,7 @@ function DouDiZhuView() {
                             </tr>
                         </thead>
                         <tbody>
-                            {data.deltaScores.map((o, idx) => {
+                            {data.deltaPoints.map((o, idx) => {
                                 if (o.enabled) {
                                     return <EnabledItem key={'td' + idx.toString()} deltas={o.deltas} readOnly={readOnly} timestamp={o.timestamp} rnd={o.round} />
                                 } else {
@@ -125,8 +125,8 @@ function DouDiZhuView() {
                             }
                             )}
                             <tr class='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
-                                <td scope='row' class='px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap'>Scores</td>
-                                {data.finalScores.map((score) => <td scope='row' class='px-6 py-4 font-bold text-gray-900 dark:text-white whitespace-nowrap'>{score}</td>)}
+                                <td scope='row' class='px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap'>Points</td>
+                                {data.finalPoints.map((score) => <td scope='row' class='px-6 py-4 font-bold text-gray-900 dark:text-white whitespace-nowrap'>{score}</td>)}
                             </tr>
                         </tbody>
                     </table>

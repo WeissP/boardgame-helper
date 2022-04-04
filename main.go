@@ -35,7 +35,7 @@ func main() {
 	host, port := json.InitConfig(configJson, GetOutboundIP().String(), "8888")
 	r := router.Router()
 	fmt.Printf("starting server on %v:%v\n", host, port)
-	testItem := doudizhu.TestInput()
+	testItem := doudizhu.JsonToStruct()
 	fmt.Printf("%+v\n", testItem)
 	log.Fatal(http.ListenAndServe(host+":"+port, cors.Default().Handler(r)))
 }

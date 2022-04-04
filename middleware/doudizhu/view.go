@@ -2,12 +2,34 @@ package doudizhu
 
 import (
 	"boardgame-helper/router/handler"
+	"boardgame-helper/utils/json"
 	"boardgame-helper/utils/timestamp"
 	"net/http"
 	"time"
 )
 
-type view struct{}
+type DeltaPoint struct {
+	Round     int    `json:"round"`
+	Timestamp string `json:"timestamp"`
+	Enabled   bool   `json:"enabled"`
+	Deltas    []int  `json:"deltas"`
+}
+type view struct {
+	PlayerNames []string     `json:"playerNames"`
+	DeltaPoints []DeltaPoint `json:"deltaPoints"`
+	FinalPoints []int        `json:"finalPoints"`
+}
+
+func JsonToStruct() view {
+	Testview, err := json.ReadFile[view]("test", "Testview.json")
+	if err != nil {
+		panic(err)
+
+	} else {
+		return Testview
+	}
+
+}
 
 var currentView view
 

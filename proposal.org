@@ -50,7 +50,7 @@ bai 和了 xiao ，各吃 jintian 和 yunfan 一口
     "isSuccess":true,
     "success":{
         "players":["bai","xiao","jintian","yunfan"]     ,     // id
-        "scores":[1,5,40, -46] // int
+        "Points":[1,5,40, -46] // int
     },
     "error":{
         "msg":"asdf"
@@ -63,7 +63,7 @@ bai 和了 xiao ，各吃 jintian 和 yunfan 一口
 #+begin_src json
 {
     "players":["bai","xiao","jintian","yunfan"]     ,     // id
-    "scores":[1,5,40, -46] // int
+    "Points":[1,5,40, -46] // int
 }
 #+end_src
 
