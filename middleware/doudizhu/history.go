@@ -38,4 +38,3 @@ func historyByDateTime(t time.Time) historyItem {
 	_ = dateTime
 	panic("not implemented") // TODO: Implement
 }
-

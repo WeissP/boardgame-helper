@@ -7,7 +7,25 @@ import (
 	"net/http"
 )
 
-type inputItem struct{}
+type inputItem struct {
+	Timestamp  string         `json:"timestamp"`
+	Stake      int            `json:"stake"`
+	BonusTiles int            `json:"bonusTiles"`
+	Players    []string       `json:"players"`
+	Points     int            `json:"points"`
+	Winner     string         `json:"winner"`
+	Weight     map[string]int `json:"weight"`
+	Lord       string         `json:"lord"`
+}
+
+func Aaa() inputItem {
+	item, err := json.ReadFile[inputItem]("test", "testInput.json")
+	if err != nil {
+		panic(err)
+	} else {
+		return item
+	}
+}
 
 func (ii inputItem) History() historyItem {
 	panic("not implemented") // TODO: Implement
