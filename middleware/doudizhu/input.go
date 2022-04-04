@@ -18,12 +18,13 @@ type inputItem struct {
 	Lord       string         `json:"lord"`
 }
 
-func Aaa() inputItem {
-	item, err := json.ReadFile[inputItem]("test", "testInput.json")
+func TestInput() string {
+	TestStruct := inputItem{"20220405...", 8, 3, []string{"bai", "xiao", "jintian", "yunfan"}, 88, "bai", map[string]int{"bai": 1}, "bai"}
+	item, err := json.From(TestStruct)
 	if err != nil {
 		panic(err)
 	} else {
-		return item
+		return string(item)
 	}
 }
 
