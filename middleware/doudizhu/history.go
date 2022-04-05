@@ -4,6 +4,7 @@ import (
 	"boardgame-helper/utils/json"
 	"boardgame-helper/utils/timestamp"
 	"fmt"
+	"sort"
 	"time"
 )
 
@@ -13,6 +14,7 @@ type historyItem struct {
 	Enabled       bool            `json:"enabled"`
 	PlayerDetails [4]playerDetail `json:"playerDetails"`
 }
+
 type playerDetail struct {
 	Player      string `json:"player"`
 	Timestamp   string `json:"timestamp"`
@@ -43,13 +45,53 @@ func (hi historyItem) write() error {
 }
 
 func (hi *historyItem) toggle(status bool) {
-	panic("not implemented") // TODO: Implement
+	// TODO: Implement
+	hi.Enabled = status
+	for _, item := range hi.PlayerDetails {
+		item.Enabled = status
+	}
+	err := hi.write()
+	if err != nil {
+		fmt.Println("can not write to json file:")
+	}
 }
 
 type historyItems []historyItem
 
 func (his historyItems) View() view {
-	panic("not implemented") // TODO: Implement
+	// TODO: Implement
+	sort.Slice(his, func(i, j int) bool { return his[i].InputItem.Timestamp < his[j].InputItem.Timestamp })
+	if len(his) == 0 {
+		panic("No game today!!!")
+	} else {
+		var currentView view
+		currentView.PlayerNames = his[0].InputItem.Players // find function to change ID to Name
+		deltaSlice := []DeltaPointsItem{}
+		currentRound := 1
+		for _, hisItem := range his {
+			deltaPointsinstance := DeltaPointsItem{}
+			deltaPointsinstance.Enabled = hisItem.Enabled
+			deltaPointsinstance.Deltas = hisItem.Deltas
+			deltaPointsinstance.Timestamp = hisItem.InputItem.Timestamp
+			if hisItem.Enabled {
+				currentRound++
+				deltaPointsinstance.Round = currentRound
+			} else {
+				deltaPointsinstance.Round = 0
+			}
+			deltaSlice = append(deltaSlice, deltaPointsinstance)
+		}
+		currentView.DeltaPoints = deltaSlice
+		finalPoints := [4]int{0, 0, 0, 0}
+		for _, deltaPoints := range currentView.DeltaPoints {
+			for i := 0; i < 4; i++ {
+				finalPoints[i] += deltaPoints.Deltas[i]
+			}
+		}
+		currentView.FinalPoints = finalPoints
+		return currentView
+	}
+
 }
 
 func (his historyItems) write() {
@@ -60,12 +102,23 @@ func (his historyItems) write() {
 
 func historyByDate(t time.Time) historyItems {
 	date := timestamp.Date(t)
-	_ = date
-	panic("not implemented") // TODO: Implement
+	// TODO: Implement
+	currentHistoryItems, err := json.ReadDir[historyItem]("history", date)
+	if err != nil {
+		fmt.Println("cannot read from json file!!!")
+	} else {
+		return currentHistoryItems
+	}
 }
 
 func historyByDateTime(t time.Time) historyItem {
+	date := timestamp.Date(t)
 	dateTime := timestamp.DateTime(t)
-	_ = dateTime
-	panic("not implemented") // TODO: Implement
+	// TODO: Implement
+	currentHistoryItem, err := json.ReadFile[historyItem]("history", date, dateTime+".json")
+	if err != nil {
+		fmt.Println("cannot read from json file!!!")
+	} else {
+		return currentHistoryItem
+	}
 }

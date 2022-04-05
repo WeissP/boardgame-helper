@@ -15,9 +15,9 @@ type DeltaPointsItem struct {
 	Deltas    [4]int `json:"deltas"`
 }
 type view struct {
-	PlayerNames [4]string          `json:"playerNames"`
-	DeltaPoints [4]DeltaPointsItem `json:"deltaPoints"`
-	FinalPoints [4]int             `json:"finalPoints"`
+	PlayerNames [4]string         `json:"playerNames"`
+	DeltaPoints []DeltaPointsItem `json:"deltaPoints"`
+	FinalPoints [4]int            `json:"finalPoints"`
 }
 
 func JsonToStruct() view {
