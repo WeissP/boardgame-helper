@@ -60,14 +60,26 @@ type historyItems []historyItem
 
 func (his historyItems) View() view {
 	// TODO: Implement
-	sort.Slice(his, func(i, j int) bool { return his[i].InputItem.Timestamp < his[j].InputItem.Timestamp })
+	sort.Slice(his, func(i, j int) bool {
+		res1, err := timestamp.Parse(his[i].InputItem.Timestamp)
+		if err != nil {
+			fmt.Println("cannot pasre string to time.Time!!!")
+		}
+		res2, err := timestamp.Parse(his[j].InputItem.Timestamp)
+		if err != nil {
+			fmt.Println("cannot pasre string to time.Time!!!")
+		}
+		return res1.Before(res2)
+	})
+	var currentView view
 	if len(his) == 0 {
-		panic("No game today!!!")
+		print("No Game Today!!!")
+		return currentView
 	} else {
-		var currentView view
+		//TODO players ID to Name
 		currentView.PlayerNames = his[0].InputItem.Players // find function to change ID to Name
 		deltaSlice := []DeltaPointsItem{}
-		currentRound := 1
+		currentRound := 0
 		for _, hisItem := range his {
 			deltaPointsinstance := DeltaPointsItem{}
 			deltaPointsinstance.Enabled = hisItem.Enabled
@@ -82,10 +94,10 @@ func (his historyItems) View() view {
 			deltaSlice = append(deltaSlice, deltaPointsinstance)
 		}
 		currentView.DeltaPoints = deltaSlice
-		finalPoints := [4]int{0, 0, 0, 0}
+		var finalPoints [4]int
 		for _, deltaPoints := range currentView.DeltaPoints {
-			for i := 0; i < 4; i++ {
-				finalPoints[i] += deltaPoints.Deltas[i]
+			for i, finalPoint := range finalPoints {
+				finalPoint += deltaPoints.Deltas[i]
 			}
 		}
 		currentView.FinalPoints = finalPoints
@@ -100,25 +112,25 @@ func (his historyItems) write() {
 	}
 }
 
-func historyByDate(t time.Time) historyItems {
+func historyByDate(t time.Time) (historyItems, error) {
 	date := timestamp.Date(t)
 	// TODO: Implement
 	currentHistoryItems, err := json.ReadDir[historyItem]("history", date)
 	if err != nil {
-		fmt.Println("cannot read from json file!!!")
-	} else {
-		return currentHistoryItems
+		err = fmt.Errorf("cannot read from json file!!! %w", err)
 	}
+	return currentHistoryItems, err
+	panic("not implemented") // TODO: Implement
 }
 
-func historyByDateTime(t time.Time) historyItem {
+func historyByDateTime(t time.Time) (historyItem, error) {
 	date := timestamp.Date(t)
 	dateTime := timestamp.DateTime(t)
 	// TODO: Implement
 	currentHistoryItem, err := json.ReadFile[historyItem]("history", date, dateTime+".json")
 	if err != nil {
-		fmt.Println("cannot read from json file!!!")
-	} else {
-		return currentHistoryItem
+		err = fmt.Errorf("cannot read from json file!!! %w", err)
 	}
+	return currentHistoryItem, err
+	panic("not implemented") // TODO: Implement
 }

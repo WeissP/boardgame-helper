@@ -15,7 +15,7 @@ func TestReadFile(t *testing.T) {
 	}{
 		{"root", []string{"a.json"}, 1},
 		{"nested1", []string{"dir", "b.json"}, 2},
-		{"nested2", []string{"dir", "c.json"}, 3},
+		{"nested2", []string{"dir", "c.json"}, 4},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
