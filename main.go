@@ -1,7 +1,6 @@
 package main
 
 import (
-	"boardgame-helper/middleware/doudizhu"
 	"boardgame-helper/router"
 	"boardgame-helper/utils/json"
 	"fmt"
@@ -35,7 +34,5 @@ func main() {
 	host, port := json.InitConfig(configJson, GetOutboundIP().String(), "8888")
 	r := router.Router()
 	fmt.Printf("starting server on %v:%v\n", host, port)
-	err := doudizhu.TestWrite()
-	fmt.Printf("%+v\n", err)
 	log.Fatal(http.ListenAndServe(host+":"+port, cors.Default().Handler(r)))
 }

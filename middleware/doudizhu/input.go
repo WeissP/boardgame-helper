@@ -3,18 +3,21 @@ package doudizhu
 import (
 	"boardgame-helper/router/handler"
 	"boardgame-helper/utils/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"math"
 	"net/http"
 )
 
+var posArray = [4]string{"lord", "support", "carry", "defense"}
+
 type inputItem struct {
 	Timestamp  string         `json:"timestamp"`
 	Stake      int            `json:"stake"`
 	BonusTiles int            `json:"bonusTiles"`
 	Players    [4]string      `json:"players"`
-	Points     int            `json:"points"`
+	RawPoints  int            `json:"points"`
 	Winner     string         `json:"winner"`
 	Weight     map[string]int `json:"weight"`
 	Lord       string         `json:"lord"`
@@ -30,98 +33,105 @@ func TestInput() string {
 	}
 }
 
-func (ii inputItem) History() (historyItem, error) {
-	// TODO: Implement
-	var Item historyItem
-	Item.InputItem = ii
+func (ii inputItem) History() (hi historyItem, err error) {
+	hi.InputItem = ii
 	// deltas
-	lordWeight := Item.InputItem.Weight[Item.InputItem.Lord]
+	hi.Deltas, err = ii.deltas()
+	if err != nil {
+		return
+	}
+
+	hi.Enabled = true
+
+	positionMap, err := ii.position()
+	if err != nil {
+		return
+	}
+
+	for i, id := range hi.InputItem.Players {
+		hi.PlayerDetails[i] = playerDetails(ii, id, positionMap[id], hi.Deltas[i])
+	}
+
+	return hi, err
+}
+
+func (ii inputItem) position() (res map[string]string, err error) {
+	lordIdx := -1
+	for i, id := range ii.Players {
+		if ii.Lord == id {
+			lordIdx = i
+		}
+	}
+	if lordIdx == -1 {
+		err = errors.New("can not find lord")
+		return
+	}
+
+	dupPlayers := append(ii.Players[:], ii.Players[:]...)
+	orderedPlayers := dupPlayers[lordIdx : lordIdx+4]
+	res = make(map[string]string)
+	for i, id := range orderedPlayers {
+		res[id] = posArray[i]
+	}
+	return
+}
+
+func (ii inputItem) deltas() (res [4]int, err error) {
+	lordWeight := ii.Weight[ii.Lord]
 	weightSum := 0
-	for _, weight := range Item.InputItem.Weight {
+	for _, weight := range ii.Weight {
 		weightSum += weight
 	}
-	ratio := Item.InputItem.Points * Item.InputItem.Stake / lordWeight
-	pointPerWeight := int(math.Ceil(float64(ratio)))
-	for key, weight := range Item.InputItem.Weight {
-		for i, id := range Item.InputItem.Players {
-			if key == id {
-				Item.Deltas[i] = weight * pointPerWeight
-			}
-		}
-	}
-	//basic delta
-	for i, id := range Item.InputItem.Players {
-		// lord win
-		if Item.InputItem.Winner == Item.InputItem.Lord {
-			if id == Item.InputItem.Lord {
-				Item.Deltas[i] += 24
-			} else {
-				Item.Deltas[i] -= 8
-			}
-		} else { //lord lose
-			if id == Item.InputItem.Lord {
-				Item.Deltas[i] -= 24
-			} else {
-				Item.Deltas[i] += 8
-			}
-		}
-	}
-	Item.Enabled = true
-	// players detail
-	for i, id := range Item.InputItem.Players {
-		Item.PlayerDetails[i].Player = id
-		Item.PlayerDetails[i].Timestamp = Item.InputItem.Timestamp
-		Item.PlayerDetails[i].Stake = Item.InputItem.Stake
-		Item.PlayerDetails[i].BonusTiles = Item.InputItem.BonusTiles
-		// bool lord
-		if id == Item.InputItem.Lord {
-			Item.PlayerDetails[i].Lord = true
-		} else {
-			Item.PlayerDetails[i].Lord = false
-		}
-		Item.PlayerDetails[i].Weight = Item.InputItem.Weight[id]
-		Item.PlayerDetails[i].Winner = Item.InputItem.Winner
-		Item.PlayerDetails[i].Rawpoints = Item.InputItem.Points
-		Item.PlayerDetails[i].Deltapoints = Item.Deltas[i]
-		Item.PlayerDetails[i].Enabled = Item.Enabled
-		// calculate position
-		var positionMap map[string]string
-		lordId := -1
-		for i, id := range Item.InputItem.Players {
-			if Item.InputItem.Lord == id {
-				positionMap[id] = "Lord"
-				lordId = i
-			}
-		}
-		currentPosition := -1
-		for i, _ := range Item.InputItem.Players {
-			if i <= lordId {
-				currentPosition = i + 4 - lordId
-			} else {
-				currentPosition = i - lordId
-			}
-			switch currentPosition {
-			case 0:
-				Item.PlayerDetails[i].Position = "lord"
-			case 1:
-				Item.PlayerDetails[i].Position = "support"
-			case 2:
-				Item.PlayerDetails[i].Position = "carry"
-			case 3:
-				Item.PlayerDetails[i].Position = "defense"
-			}
-		}
-	}
-	// check error
-	var err error
 	if weightSum != 0 {
-		err = fmt.Errorf("sum of weight is not 0")
-		Item.Enabled = false
-		for i, _ := range Item.InputItem.Players {
-			Item.PlayerDetails[i].Enabled = Item.Enabled
+		err = fmt.Errorf("you are large sha bi, sum of weight is not 0!!!")
+		return
+	}
+
+	ratio := float64(ii.RawPoints*ii.Stake) / float64(lordWeight)
+	pointPerWeight := int(math.Ceil(ratio))
+	for key, weight := range ii.Weight {
+		for i, id := range ii.Players {
+			if key == id {
+				res[i] = weight * pointPerWeight
+			}
 		}
 	}
-	return Item, err
+	// basic point
+	for i, id := range ii.Players {
+		// lord win
+		if ii.Winner == ii.Lord {
+			if id == ii.Lord {
+				res[i] += 24
+			} else {
+				res[i] -= 8
+			}
+		} else { // lord lose
+			if id == ii.Lord {
+				res[i] -= 24
+			} else {
+				res[i] += 8
+			}
+		}
+	}
+	return
+}
+
+func playerDetails(ii inputItem, id, pos string, delta int) (res playerDetail) {
+	res.Player = id
+	res.Timestamp = ii.Timestamp
+	res.Stake = ii.Stake
+	res.BonusTiles = ii.BonusTiles
+
+	res.Lord = pos == posArray[0]
+	res.Position = pos
+
+	res.Weight = ii.Weight[id]
+	res.Winner = ii.Winner
+	res.Rawpoints = ii.RawPoints
+	res.Deltapoints = delta
+	res.Enabled = true
+
+	return
 }
 
 func AddInput(w http.ResponseWriter, r *http.Request) (herr handler.Err) {

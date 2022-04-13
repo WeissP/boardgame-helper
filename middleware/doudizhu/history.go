@@ -44,8 +44,7 @@ func (hi historyItem) write() error {
 	return err
 }
 
-func (hi *historyItem) toggle(status bool) {
-	// TODO: Implement
+func (hi *historyItem) toggle(status bool) error {
 	hi.Enabled = status
 	for _, item := range hi.PlayerDetails {
 		item.Enabled = status
@@ -54,83 +53,79 @@ func (hi *historyItem) toggle(status bool) {
 	if err != nil {
 		fmt.Println("can not write to json file:")
 	}
+	return err
 }
 
 type historyItems []historyItem
 
-func (his historyItems) View() view {
-	// TODO: Implement
-	sort.Slice(his, func(i, j int) bool {
-		res1, err := timestamp.Parse(his[i].InputItem.Timestamp)
-		if err != nil {
-			fmt.Println("cannot pasre string to time.Time!!!")
-		}
-		res2, err := timestamp.Parse(his[j].InputItem.Timestamp)
-		if err != nil {
-			fmt.Println("cannot pasre string to time.Time!!!")
-		}
-		return res1.Before(res2)
-	})
-	var currentView view
-	if len(his) == 0 {
-		print("No Game Today!!!")
-		return currentView
-	} else {
-		//TODO players ID to Name
-		currentView.PlayerNames = his[0].InputItem.Players // find function to change ID to Name
-		deltaSlice := []DeltaPointsItem{}
-		currentRound := 0
-		for _, hisItem := range his {
-			deltaPointsinstance := DeltaPointsItem{}
-			deltaPointsinstance.Enabled = hisItem.Enabled
-			deltaPointsinstance.Deltas = hisItem.Deltas
-			deltaPointsinstance.Timestamp = hisItem.InputItem.Timestamp
-			if hisItem.Enabled {
-				currentRound++
-				deltaPointsinstance.Round = currentRound
-			} else {
-				deltaPointsinstance.Round = 0
-			}
-			deltaSlice = append(deltaSlice, deltaPointsinstance)
-		}
-		currentView.DeltaPoints = deltaSlice
-		var finalPoints [4]int
-		for _, deltaPoints := range currentView.DeltaPoints {
-			for i, finalPoint := range finalPoints {
-				finalPoint += deltaPoints.Deltas[i]
-			}
-		}
-		currentView.FinalPoints = finalPoints
-		return currentView
-	}
+func namesToIDs(name [4]string) (ids [4]string) {
+	// _ = players.NameToID(name[0])
+	panic("not implemented") // TODO: Implement
+}
 
+func (his historyItems) View() (res view) {
+	sort.Slice(his, func(i, j int) bool {
+		resI, err := timestamp.Parse(his[i].InputItem.Timestamp)
+		if err != nil {
+			panic(err)
+		}
+		resJ, err := timestamp.Parse(his[j].InputItem.Timestamp)
+		if err != nil {
+			panic(err)
+		}
+		return resI.Before(resJ)
+	})
+	if len(his) == 0 {
+		return res
+	} else {
+		res.PlayerNames = namesToIDs(his[0].InputItem.Players) // find function to change ID to Name
+		currentRound := 0
+		for _, item := range his {
+			dpi := DeltaPointsItem{}
+			dpi.Enabled = item.Enabled
+			dpi.Deltas = item.Deltas
+			dpi.Timestamp = item.InputItem.Timestamp
+			if item.Enabled {
+				currentRound++
+				dpi.Round = currentRound
+			}
+			res.DeltaPoints = append(res.DeltaPoints, dpi)
+		}
+		var finalPoints [4]int
+		for _, dp := range res.DeltaPoints {
+			for i := range finalPoints {
+				finalPoints[i] += dp.Deltas[i]
+			}
+		}
+		res.FinalPoints = finalPoints
+		return res
+	}
 }
 
 func (his historyItems) write() {
 	for _, x := range his {
-		x.write()
+		err := x.write()
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
-func historyByDate(t time.Time) (historyItems, error) {
+func historyByDate(t time.Time) (hi historyItems, err error) {
 	date := timestamp.Date(t)
-	// TODO: Implement
-	currentHistoryItems, err := json.ReadDir[historyItem]("history", date)
+	hi, err = json.ReadDir[historyItem]("history", date)
 	if err != nil {
 		err = fmt.Errorf("cannot read from json file!!! %w", err)
 	}
-	return currentHistoryItems, err
-	panic("not implemented") // TODO: Implement
+	return
 }
 
-func historyByDateTime(t time.Time) (historyItem, error) {
+func historyByDateTime(t time.Time) (hi historyItem, err error) {
 	date := timestamp.Date(t)
 	dateTime := timestamp.DateTime(t)
-	// TODO: Implement
-	currentHistoryItem, err := json.ReadFile[historyItem]("history", date, dateTime+".json")
+	hi, err = json.ReadFile[historyItem]("history", date, dateTime+".json")
 	if err != nil {
 		err = fmt.Errorf("cannot read from json file!!! %w", err)
 	}
-	return currentHistoryItem, err
-	panic("not implemented") // TODO: Implement
+	return
 }
