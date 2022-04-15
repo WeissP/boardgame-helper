@@ -17,7 +17,7 @@ type inputItem struct {
 	Stake      int            `json:"stake"`
 	BonusTiles int            `json:"bonusTiles"`
 	Players    [4]string      `json:"players"`
-	RawPoints  int            `json:"points"`
+	RawPoints  int            `json:"rawPoints"`
 	Winner     string         `json:"winner"`
 	Weight     map[string]int `json:"weight"`
 	Lord       string         `json:"lord"`
@@ -35,7 +35,6 @@ func TestInput() string {
 
 func (ii inputItem) History() (hi historyItem, err error) {
 	hi.InputItem = ii
-	// deltas
 	hi.Deltas, err = ii.deltas()
 	if err != nil {
 		return
@@ -49,7 +48,7 @@ func (ii inputItem) History() (hi historyItem, err error) {
 	}
 
 	for i, id := range hi.InputItem.Players {
-		hi.PlayerDetails[i] = playerDetails(ii, id, positionMap[id], hi.Deltas[i])
+		hi.PlayerDetails[i] = ii.playerDetails(id, positionMap[id], hi.Deltas[i])
 	}
 
 	return hi, err
@@ -116,22 +115,20 @@ func (ii inputItem) deltas() (res [4]int, err error) {
 	return
 }
 
-func playerDetails(ii inputItem, id, pos string, delta int) (res playerDetail) {
-	res.Player = id
-	res.Timestamp = ii.Timestamp
-	res.Stake = ii.Stake
-	res.BonusTiles = ii.BonusTiles
-
-	res.Lord = pos == posArray[0]
-	res.Position = pos
-
-	res.Weight = ii.Weight[id]
-	res.Winner = ii.Winner
-	res.Rawpoints = ii.RawPoints
-	res.Deltapoints = delta
-	res.Enabled = true
-
-	return
+func (ii inputItem) playerDetails(id, pos string, delta int) playerDetail {
+	return playerDetail{
+		Player:      id,
+		Timestamp:   ii.Timestamp,
+		Stake:       ii.Stake,
+		BonusTiles:  ii.BonusTiles,
+		Lord:        pos == posArray[0],
+		Position:    pos,
+		Weight:      ii.Weight[id],
+		Winner:      ii.Winner,
+		Rawpoints:   ii.RawPoints,
+		Deltapoints: delta,
+		Enabled:     true,
+	}
 }
 
 func AddInput(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
