@@ -1,9 +1,11 @@
 package doudizhu
 
 import (
+	"boardgame-helper/router/handler"
 	"boardgame-helper/utils/json"
 	"boardgame-helper/utils/timestamp"
 	"fmt"
+	"net/http"
 	"sort"
 	"time"
 )
@@ -128,4 +130,45 @@ func historyByDateTime(t time.Time) (hi historyItem, err error) {
 		err = fmt.Errorf("cannot read from json file!!! %w", err)
 	}
 	return
+}
+
+func EnableHistory(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
+	r.ParseForm()
+	tsStr := r.Form.Get("timestamp")
+	if tsStr == "" {
+		return handler.CommonErr(nil, "timestamp is empty")
+	}
+	ts, err := timestamp.Parse(tsStr)
+	if err != nil {
+		return handler.CommonErr(err, "can not parse timestamp")
+	}
+	hi, err := historyByDateTime(ts)
+	if err != nil {
+		return handler.CommonErr(err, "can not get history by date time")
+	}
+	err = hi.toggle(true)
+	if err != nil {
+		return handler.CommonErr(err, "can not toggle history")
+	}
+
+}
+
+func DisableHistory(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
+	r.ParseForm()
+	tsStr := r.Form.Get("timestamp")
+	if tsStr == "" {
+		return handler.CommonErr(nil, "timestamp is empty")
+	}
+	ts, err := timestamp.Parse(tsStr)
+	if err != nil {
+		return handler.CommonErr(err, "can not parse timestamp")
+	}
+	hi, err := historyByDateTime(ts)
+	if err != nil {
+		return handler.CommonErr(err, "can not get history by date time")
+	}
+	err = hi.toggle(false)
+	if err != nil {
+		return handler.CommonErr(err, "can not toggle history")
+	}
 }

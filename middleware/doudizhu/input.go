@@ -3,6 +3,7 @@ package doudizhu
 import (
 	"boardgame-helper/router/handler"
 	"boardgame-helper/utils/json"
+	"boardgame-helper/utils/timestamp"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -131,6 +132,14 @@ func (ii inputItem) playerDetails(id, pos string, delta int) playerDetail {
 	}
 }
 
+func (ii inputItem) JSON() []byte {
+	res, err := json.From(ii)
+	if err != nil {
+		panic(err)
+	}
+	return res
+}
+
 func AddInput(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -147,4 +156,21 @@ func AddInput(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	res.write()
 	updateCurView()
 	return
+}
+
+func EditInput(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
+	r.ParseForm()
+	tsStr := r.Form.Get("timestamp")
+	if tsStr == "" {
+		return handler.CommonErr(nil, "timestamp is empty")
+	}
+	ts, err := timestamp.Parse(tsStr)
+	if err != nil {
+		return handler.CommonErr(err, "can not parse timestamp")
+	}
+	hi, err := historyByDateTime(ts)
+	if err != nil {
+		return handler.CommonErr(err, "can not get history by date time")
+	}
+	w.Write(hi.InputItem.JSON())
 }

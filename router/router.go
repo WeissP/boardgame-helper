@@ -13,6 +13,11 @@ func Router() *mux.Router {
 	r.HandleFunc("/api/test/point/{point}", handler.Wrap(middleware.PointTest))
 	r.HandleFunc("/api/test/int", handler.Wrap(middleware.OnlyIntTest))
 	r.HandleFunc("/api/save", handler.Wrap(middleware.SaveTest))
+	r.HandleFunc("/api/doudizhu/view/now", handler.Wrap(doudizhu.GetViewNow))
 	r.HandleFunc("/api/doudizhu/view/date", handler.Wrap(doudizhu.GetViewByDate))
+	r.HandleFunc("/api/doudizhu/disable", handler.Wrap(doudizhu.DisableHistory))
+	r.HandleFunc("/api/doudizhu/enable", handler.Wrap(doudizhu.EnableHistory))
+	r.HandleFunc("/api/doudizhu/new", handler.Wrap(doudizhu.AddInput))
+	r.HandleFunc("/api/doudizhu/edit", handler.Wrap(doudizhu.EditInput))
 	return r
 }
