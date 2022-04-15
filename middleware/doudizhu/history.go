@@ -150,7 +150,7 @@ func EnableHistory(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	if err != nil {
 		return handler.CommonErr(err, "can not toggle history")
 	}
-
+	return
 }
 
 func DisableHistory(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
@@ -171,4 +171,5 @@ func DisableHistory(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	if err != nil {
 		return handler.CommonErr(err, "can not toggle history")
 	}
+	return
 }

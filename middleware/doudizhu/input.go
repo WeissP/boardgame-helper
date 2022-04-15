@@ -173,4 +173,5 @@ func EditInput(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 		return handler.CommonErr(err, "can not get history by date time")
 	}
 	w.Write(hi.InputItem.JSON())
+	return
 }
