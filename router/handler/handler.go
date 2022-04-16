@@ -19,7 +19,7 @@ func (e Err) String() string {
 	if e.Error == nil {
 		return e.Message
 	}
-	return fmt.Errorf("%s:%w", e.Message, e.Error).Error()
+	return fmt.Errorf("%s\n%w", e.Message, e.Error).Error()
 }
 
 func NewError(error error, msg string, errCode int) Err {
@@ -30,8 +30,8 @@ func CommonErr(error error, msg string) Err {
 	return Err{error, msg, 500}
 }
 
-func NoImplementErr(error error, msg string) Err {
-	return Err{error, msg, 501}
+func NoImplementErr() Err {
+	return Err{nil, "not yet implemented", 501}
 }
 
 func Wrap(fn func(http.ResponseWriter, *http.Request) Err) func(http.ResponseWriter, *http.Request) {
