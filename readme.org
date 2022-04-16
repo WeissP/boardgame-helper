@@ -16,8 +16,8 @@ no input
 
 [view]
 
-
-
+**** =update=
+update current view
 **** =date=
 
 ***** input 
