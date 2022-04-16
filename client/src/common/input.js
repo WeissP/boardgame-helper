@@ -10,20 +10,21 @@ const PlayerList = ({ player, playerOnChange }) => {
             value={player}
             onChange={e => playerOnChange(e.target.value)}
         >
-            <option value='unknown'>name</option>
-            {playersArray().map(([key, val]) => <option value={key}>{val}</option>)}
+            <option key='unknown' value='unknown'>name</option>
+            {playersArray().map(([key, val]) => <option key={'option' + key} value={key}>{val}</option>)}
         </select>
     )
 }
 
-const UserList = ({ userChanged }) => {
+const UserList = ({ value, setValue }) => {
     return (
         <select
             class='form-select block w-fit px-1 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
-            onChange={e => userChanged(e.target.value)}
+            onChange={e => setValue(e.target.value)}
+            value={value}
         >
-            <option value='unknown'>name</option>
-            {playersArray().map(([key, val]) => <option value={key}>{val}</option>)}
+            <option key='unknown' value='unknown'>name</option>
+            {playersArray().map(([key, val]) => <option key={'option' + key} value={key}>{val}</option>)}
         </select>
     )
 }
@@ -63,4 +64,4 @@ const INum = ({ dftValue, label }) => {
     )
 }
 
-export { INum, InputText, UserList ,PlayerList}
+export { INum, InputText, UserList, PlayerList }
