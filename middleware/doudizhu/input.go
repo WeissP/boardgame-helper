@@ -154,7 +154,6 @@ func AddInput(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 		return handler.CommonErr(err, "cannot generate the correct history!!!")
 	}
 	res.write()
-	updateCurView()
 	return
 }
 

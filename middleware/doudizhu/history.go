@@ -43,6 +43,7 @@ func (hi historyItem) write() error {
 	date := timestamp.Date(t)
 	dateTime := timestamp.DateTime(t)
 	err = json.WriteNew(jsonFile, "history", date, dateTime+".json")
+	updateCurView()
 	return err
 }
 

@@ -64,14 +64,18 @@ func GetViewByDate(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 }
 
 func Update(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
-	updateCurView()
+	err := updateCurView()
+	if err != nil {
+		return handler.CommonErr(err, "can not update current view")
+	}
 	return
 }
 
-func updateCurView() {
+func updateCurView() error {
 	his, err := historyByDate(time.Now())
 	if err != nil {
-		panic(err)
+		return err
 	}
 	currentView = his.View()
+	return nil
 }
