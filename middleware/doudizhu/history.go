@@ -61,6 +61,7 @@ func (hi *historyItem) toggle(status bool) error {
 type historyItems []historyItem
 
 func namesToIDs(name [4]string) (ids [4]string) {
+	return name					// delete this line when implementing
 	// _ = players.NameToID(name[0])
 	panic("not implemented") // TODO: Implement
 }
@@ -171,5 +172,20 @@ func DisableHistory(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	if err != nil {
 		return handler.CommonErr(err, "can not toggle history")
 	}
+	return
+}
+
+func CurPlayers(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
+	// TODO: Implement
+	res := struct {
+		Players []string `json:"players"`
+	}{
+		[]string{"bai", "xiao", "jintian", "yunfan"},
+	}
+	j, err := json.From(res)
+	if err != nil {
+		return handler.CommonErr(err, "can not convert players to JSON")
+	}
+	w.Write(j)
 	return
 }

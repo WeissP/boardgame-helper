@@ -19,5 +19,6 @@ func Router() *mux.Router {
 	r.HandleFunc("/api/doudizhu/enable", handler.Wrap(doudizhu.EnableHistory))
 	r.HandleFunc("/api/doudizhu/new", handler.Wrap(doudizhu.AddInput))
 	r.HandleFunc("/api/doudizhu/edit", handler.Wrap(doudizhu.EditInput))
+	r.HandleFunc("/api/doudizhu/curPlayers", handler.Wrap(doudizhu.CurPlayers))
 	return r
 }

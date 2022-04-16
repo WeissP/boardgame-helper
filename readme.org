@@ -69,6 +69,19 @@ no output
 
 [input]
 
+*** =curPlayers= /Get/
+
+no input
+
+**** output
+#+begin_src json
+{
+    "players":[]
+}
+#+end_src
+
+get players id with correct position, this infomation should be retrieved from the last history today 
+
 ** =players= /Get/
 no input
 
