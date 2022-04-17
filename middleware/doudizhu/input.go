@@ -87,7 +87,7 @@ func (ii inputItem) deltas() (res [4]int, err error) {
 		return
 	}
 
-	ratio := float64(ii.RawPoints*ii.Stake) / float64(lordWeight)
+	ratio := float64(ii.RawPoints*ii.Stake) / math.Abs(float64(lordWeight))
 	pointPerWeight := int(math.Ceil(ratio))
 	for key, weight := range ii.Weight {
 		for i, id := range ii.Players {
@@ -97,6 +97,10 @@ func (ii inputItem) deltas() (res [4]int, err error) {
 		}
 	}
 	// basic point
+	err = ii.checkWinner()
+	if err != nil {
+		return
+	}
 	for i, id := range ii.Players {
 		// lord win
 		if ii.Winner == ii.Lord {
@@ -112,6 +116,20 @@ func (ii inputItem) deltas() (res [4]int, err error) {
 				res[i] += 8
 			}
 		}
+	}
+	return
+}
+
+func (ii inputItem) checkWinner() (err error) {
+	existWinner := false
+	for _, id := range ii.Players {
+		if ii.Winner == id {
+			existWinner = true
+			break
+		}
+	}
+	if !existWinner {
+		err = fmt.Errorf("no winner found!!!")
 	}
 	return
 }
