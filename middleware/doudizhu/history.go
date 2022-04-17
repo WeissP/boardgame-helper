@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strconv"
 	"time"
 )
 
@@ -62,7 +63,7 @@ func (hi *historyItem) toggle(status bool) error {
 type historyItems []historyItem
 
 func namesToIDs(name [4]string) (ids [4]string) {
-	return name					// delete this line when implementing
+	return name // delete this line when implementing
 	// _ = players.NameToID(name[0])
 	panic("not implemented") // TODO: Implement
 }
@@ -97,6 +98,9 @@ func (his historyItems) View() (res view) {
 		}
 		var finalPoints [4]int
 		for _, dp := range res.DeltaPoints {
+			if !dp.Enabled {
+				continue
+			}
 			for i := range finalPoints {
 				finalPoints[i] += dp.Deltas[i]
 			}
@@ -177,11 +181,36 @@ func DisableHistory(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 }
 
 func CurPlayers(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
-	// TODO: Implement
 	res := struct {
 		Players []string `json:"players"`
-	}{
-		[]string{"bai", "xiao", "jintian", "yunfan"},
+	}{}
+	tn := time.Now()
+	his, err := historyByDate(tn)
+	if err != nil {
+		handler.CommonErr(nil, "cannot get history by date!!!")
+	}
+	sort.Slice(his, func(i, j int) bool {
+		resI, err := timestamp.Parse(his[i].InputItem.Timestamp)
+		if err != nil {
+			panic(err)
+		}
+		resJ, err := timestamp.Parse(his[j].InputItem.Timestamp)
+		if err != nil {
+			panic(err)
+		}
+		return resI.After(resJ)
+	})
+	if len(his) == 0 {
+		return handler.CommonErr(nil, "no game today")
+	}
+	res.Players = his[0].InputItem.Players[:]
+	if len(res.Players) != 4 {
+		return handler.CommonErr(nil, "missing player - the number of players is not 4")
+	}
+	for i, id := range res.Players {
+		if id == "" {
+			return handler.CommonErr(nil, "missing player - player "+strconv.Itoa(i+1)+" is missing")
+		}
 	}
 	j, err := json.From(res)
 	if err != nil {
