@@ -9,19 +9,21 @@ import {
     Route
 } from 'react-router-dom'
 import { DouDiZhuInputDft, DouDiZhuInputEdit } from './routes/doudizhuInput'
+import { JMPoints } from './routes/jpMahjong'
 import DouDiZhuView from './routes/doudizhuView'
 
 const container = document.getElementById('root')
 const root = ReactDOM.createRoot(container)
 
 root.render(<BrowserRouter>
-        <Routes>
-            <Route path='/' element={<DouDiZhuView />} />
-            <Route path='doudizhu-input' element={<DouDiZhuInputDft />} />
-            <Route path='doudizhu-edit/:timestamp' element={<DouDiZhuInputEdit />} />
-            <Route path='doudizhu-view' element={<DouDiZhuView />} />
-        </Routes>
-    </BrowserRouter>)
+    <Routes>
+        <Route path='/' element={<DouDiZhuView />} />
+        <Route path='doudizhu-input' element={<DouDiZhuInputDft />} />
+        <Route path='doudizhu-edit/:timestamp' element={<DouDiZhuInputEdit />} />
+        <Route path='doudizhu-view' element={<DouDiZhuView />} />
+        <Route path='jp-mahjong' element={<JMPoints />} />
+    </Routes>
+</BrowserRouter>)
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

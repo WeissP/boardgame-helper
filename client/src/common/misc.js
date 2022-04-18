@@ -5,4 +5,8 @@ const objectMap = (obj, fn) =>
         )
     )
 
-export { objectMap }
+const updateArray = (f, x, index) => {
+    f((prev) => prev.map((el, i) => (i !== index ? el : x)))
+}
+
+export { objectMap, updateArray }

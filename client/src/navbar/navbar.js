@@ -14,11 +14,14 @@ const NavBarInstance = ({ onSelect, activeKey, ...props }) => {
 
     return (
         <Navbar {...props}>
-            <Navbar.Brand href=''>Boardgame Helper</Navbar.Brand>
+            <Navbar.Brand href='/doudizhu-view'>Boardgame Helper</Navbar.Brand>
             <Nav onSelect={onSelect} activeKey={activeKey}>
                 <Dropdown menuStyle={{ minWidth: 95 }} class='z-50' title='斗地主'>
                     <Dropdown.Item icon={<EditIcon />} eventKey='/doudizhu-input' onSelect={(key, _) => routeChange(key)}>记分</Dropdown.Item>
                     <Dropdown.Item icon={<DashboardIcon />} eventKey='/doudizhu-view' onSelect={(key, _) => routeChange(key)}>查分</Dropdown.Item>
+                </Dropdown>
+                <Dropdown menuStyle={{ minWidth: 95 }} class='z-50' title='日麻'>
+                    <Dropdown.Item icon={<EditIcon />} eventKey='/jp-mahjong' onSelect={(key, _) => routeChange(key)}>记分</Dropdown.Item>
                 </Dropdown>
             </Nav>
         </Navbar>
