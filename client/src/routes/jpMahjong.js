@@ -136,7 +136,7 @@ function roundUpNearest100(num) {
     return Math.ceil(num / 100) * 100
 }
 
-const Fu = ({ setValue }) => {
+const Fu = ({ setValue,isZiMo }) => {
     const [menQian, setMenQian] = React.useState(false)
     const [yiMainTing, setYiMainTing] = React.useState(false)
     const [queTou, setQueTou] = React.useState(0)
@@ -150,7 +150,8 @@ const Fu = ({ setValue }) => {
     useEffect(() => {
         setValue(20 +
             roundUpNearest10(
-                (menQian ? 2 : 0) +
+                (menQian && !isZiMo ? 10 : 0) +
+                (isZiMo ? 2 : 0) +
                 (yiMainTing ? 2 : 0) +
                 Number(queTou) +
                 mainziFu.reduce((partialSum, a) => partialSum + Number(a), 0))
@@ -179,26 +180,6 @@ const Fu = ({ setValue }) => {
                 </PanelGroup>
             </div>
         </>
-    )
-}
-
-const Fan = ({ fan, setFan }) => {
-    const [isZhuang, setIsZhuang] = React.useState(false)
-    const [isZiMo, setIsZiMo] = React.useState(false)
-
-    return (
-        <Panel header='结果'>
-            <Checkbox
-                value='isZhuang' inline checked={isZhuang} onChange={(_, v) => { setIsZhuang(v) }}
-            > 庄家和
-            </Checkbox>
-            <Checkbox
-                value='isZiMo' inline checked={isZiMo} onChange={(_, v) => { setIsZiMo(v) }}
-            > 自摸
-            </Checkbox>
-            <hr />
-            <InputNumber prefix='番' type='number' value={fan} onChange={(n, _) => setFan(n)} min={1} />
-        </Panel>
     )
 }
 
@@ -240,7 +221,6 @@ const JMPoints = () => {
                     base = 2000
                 }
         }
-        console.log('base:' + base)
         switch (true) {
             case isZhuang && isZiMo:
                 setRes(roundUpNearest100(2 * base) + lianZhuang * 300)
@@ -298,7 +278,7 @@ const JMPoints = () => {
                 {!isQiDui && fan < 5 &&
                     <>
                         <Divider> 符</Divider>
-                        <Fu setValue={setFu} />
+                        <Fu setValue={setFu} isZiMo={isZiMo} />
                     </>}
 
             </div>
