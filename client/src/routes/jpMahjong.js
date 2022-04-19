@@ -136,7 +136,7 @@ function roundUpNearest100(num) {
     return Math.ceil(num / 100) * 100
 }
 
-const Fu = ({ setValue,isZiMo }) => {
+const Fu = ({ setValue, isZiMo }) => {
     const [menQian, setMenQian] = React.useState(false)
     const [yiMainTing, setYiMainTing] = React.useState(false)
     const [queTou, setQueTou] = React.useState(0)
@@ -186,9 +186,11 @@ const Fu = ({ setValue,isZiMo }) => {
 const JMPoints = () => {
     const [fu, setFu] = React.useState(20)
     const [fan, setFan] = React.useState(1)
+    const [minFan, setMinFan] = React.useState(1)
     const [isZhuang, setIsZhuang] = React.useState(false)
     const [isZiMo, setIsZiMo] = React.useState(false)
     const [isQiDui, setIsQiDui] = React.useState(false)
+    const [isZiMoPingHu, setIsZiMoPingHu] = React.useState(false)
     const [lianZhuang, setLianZhuang] = React.useState(0)
     const [res, setRes] = React.useState('0')
 
@@ -216,8 +218,7 @@ const JMPoints = () => {
                 break
             default:
                 base = fu * Math.pow(2, 2 + Number(fan))
-                // console.log('fu:' + fu + ',fan:' + fan + ',pow:' + Math.pow(2, 2 + fan))
-                if (base > 2000 && fan == 4) {
+                if (base > 2000) {
                     base = 2000
                 }
         }
@@ -235,47 +236,78 @@ const JMPoints = () => {
                 setRes(roundUpNearest100(4 * base) + lianZhuang * 300)
                 break
         }
-        // setRes(base)
     }
 
     useEffect(() => {
         updateRes()
     })
 
+    useEffect(() => {
+        if (isZiMoPingHu) {
+            setFu(20)
+            setIsQiDui(false)
+            setIsZiMo(true)
+            setMinFan(2)
+            if (fan < 2) {
+                setFan(2)
+            }
+        } else {
+            setMinFan(1)
+            if (fan == 2) {
+                setFan(1)
+            }
+        }
+    }, [isZiMoPingHu])
     return (
         <>
             <Header />
             <div class='mt-5 min-h-screen py-2'>
-                <Panel bordered shaded>
-                    {isZhuang ? '庄家' : ' 闲家'}{isZiMo ? '自摸' : '荣和'} :  {fan} 番 {fan < 5 ? fu + '符' : ''}  <ArrowRightIcon style={{ fontSize: '2em', marginBottom: '3px' }} /> {res}
-                </Panel>
                 <div class='flex flex-col items-center'>
+                    <Panel bordered shaded>
+                        {isZhuang ? '庄家' : ' 闲家'}{isZiMo ? '自摸' : '荣和'} :  {fan} 番 {fan < 5 ? fu + '符' : ''}  <ArrowRightIcon style={{ fontSize: '2em', marginBottom: '3px' }} /> {res}
+                    </Panel>
                     <Panel header='结果'>
                         <Checkbox
                             value='isZhuang' inline checked={isZhuang} onChange={(_, v) => { setIsZhuang(v) }}
                         > 庄家和
                         </Checkbox>
                         <Checkbox
-                            value='isZiMo' inline checked={isZiMo} onChange={(_, v) => { setIsZiMo(v) }}
+                            value='isZiMo' inline checked={isZiMo} onChange={(_, v) => {
+                                if (!v && isZiMoPingHu) {
+                                    setIsZiMoPingHu(false)
+                                }
+                                setIsZiMo(v)
+                            }}
                         > 自摸
                         </Checkbox>
-                        <Checkbox
-                            value='isQiDui' inline checked={isQiDui} onChange={(_, v) => {
-                                if (v) {
-                                    setFu(25)
-                                }
-                                setIsQiDui(v)
-                            }}
-                        > 七对
-                        </Checkbox>
-                        <hr />
+                        <br />
+                        <br />
                         <Stack spacing={6}>
-                            <InputNumber prefix='番' type='number' value={fan} onChange={(n, _) => setFan(n)} min={1} />
+                            <InputNumber prefix='番' type='number' value={fan} onChange={(n, _) => setFan(n)} min={minFan} />
                             <InputNumber prefix='连庄' type='number' value={lianZhuang} onChange={(n, _) => setLianZhuang(n)} min={0} />
                         </Stack>
+                        <br />
+                        <Panel header='特殊情况' collapsible bordered>
+                            <Checkbox
+                                value='isQiDui' inline checked={isQiDui} onChange={(_, v) => {
+                                    if (v) {
+                                        setFu(25)
+                                        setIsZiMoPingHu(false)
+                                    }
+                                    setIsQiDui(v)
+                                }}
+                            > 七对
+                            </Checkbox>
+                            <Checkbox
+                                value='isZiMoPingHu' inline checked={isZiMoPingHu} onChange={(_, v) => {
+                                    setIsZiMoPingHu(v)
+                                }}
+                            > 自摸平和
+                            </Checkbox>
+                        </Panel>
                     </Panel>
                 </div>
-                {!isQiDui && fan < 5 &&
+                {!isQiDui && !isZiMoPingHu && fan < 5 &&
                     <>
                         <Divider> 符</Divider>
                         <Fu setValue={setFu} isZiMo={isZiMo} />
