@@ -7,20 +7,20 @@
   ],
   "winner": "xiao",
   "weight": {
-    "xiao": "3",
-    "bai": "-3",
-    "yunfan": "0",
-    "jintian": "0"
+    "xiao": 3,
+    "bai": -3,
+    "yunfan": 0,
+    "jintian": 0
   },
 
-  "points": "26",
-  "stake": "3",
-  "bonusTiles": "3",
+  "rawPoints": 26,
+  "stake": 3,
+  "bonusTiles": 3,
   "final_points": {
-    "bai": "-86",
-    "xiao": "102",
-    "jintian": "-8",
-    "yunfan": "-8"
+    "bai": -86,
+    "xiao": 102,
+    "jintian": -8,
+    "yunfan": -8
   },
   "lord": "xiao",
   "timestamp": "2022-03-31T15:16:42.414Z"
