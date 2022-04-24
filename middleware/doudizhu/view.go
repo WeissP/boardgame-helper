@@ -4,6 +4,7 @@ import (
 	"boardgame-helper/router/handler"
 	"boardgame-helper/utils/json"
 	"boardgame-helper/utils/timestamp"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -59,7 +60,11 @@ func GetViewByDate(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	if err != nil {
 		panic(err)
 	}
-	w.Write(his.View().JSON())
+	view, err := his.View()
+	if err != nil {
+		return handler.CommonErr(err, "cannot get view by date")
+	}
+	w.Write(view.JSON())
 	return
 }
 
@@ -76,6 +81,11 @@ func updateCurView() error {
 	if err != nil {
 		return err
 	}
-	currentView = his.View()
+	view, err := his.View()
+	if err != nil {
+		return fmt.Errorf("cannot update cuurentview %w", err)
+	}
+	currentView = view
+
 	return nil
 }

@@ -88,7 +88,7 @@ func (his historyItems) View() (res view, err error) {
 		return resI.Before(resJ)
 	})
 	if len(his) == 0 {
-		return res
+		return res, nil
 	} else {
 		names, e := IDsToNames(his[0].InputItem.Players) // find function to change ID to Name
 		if e != nil {
@@ -117,7 +117,7 @@ func (his historyItems) View() (res view, err error) {
 			}
 		}
 		res.FinalPoints = finalPoints
-		return res
+		return res, nil
 	}
 }
 
