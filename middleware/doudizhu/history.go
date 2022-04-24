@@ -149,75 +149,64 @@ func historyByDateTime(t time.Time) (hi historyItem, err error) {
 	return
 }
 
-func EnableHistory(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
-	r.ParseForm()
-	tsStr := r.Form.Get("timestamp")
-	if tsStr == "" {
-		return handler.CommonErr(nil, "timestamp is empty")
+func ToggleHistory(status bool) func(w http.ResponseWriter, r *http.Request) handler.Err {
+	return func(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
+		r.ParseForm()
+		tsStr := r.Form.Get("timestamp")
+		if tsStr == "" {
+			return handler.CommonErr(nil, "timestamp is empty")
+		}
+		ts, err := timestamp.Parse(tsStr)
+		if err != nil {
+			return handler.CommonErr(err, "can not parse timestamp")
+		}
+		hi, err := historyByDateTime(ts)
+		if err != nil {
+			return handler.CommonErr(err, "can not get history by date time")
+		}
+		err = hi.toggle(status)
+		if err != nil {
+			return handler.CommonErr(err, "can not toggle history")
+		}
+		return
 	}
-	ts, err := timestamp.Parse(tsStr)
-	if err != nil {
-		return handler.CommonErr(err, "can not parse timestamp")
-	}
-	hi, err := historyByDateTime(ts)
-	if err != nil {
-		return handler.CommonErr(err, "can not get history by date time")
-	}
-	err = hi.toggle(true)
-	if err != nil {
-		return handler.CommonErr(err, "can not toggle history")
-	}
-	return
-}
-
-func DisableHistory(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
-	r.ParseForm()
-	tsStr := r.Form.Get("timestamp")
-	if tsStr == "" {
-		return handler.CommonErr(nil, "timestamp is empty")
-	}
-	ts, err := timestamp.Parse(tsStr)
-	if err != nil {
-		return handler.CommonErr(err, "can not parse timestamp")
-	}
-	hi, err := historyByDateTime(ts)
-	if err != nil {
-		return handler.CommonErr(err, "can not get history by date time")
-	}
-	err = hi.toggle(false)
-	if err != nil {
-		return handler.CommonErr(err, "can not toggle history")
-	}
-	return
 }
 
 func CurPlayers(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	res := struct {
-		Players []string `json:"players"`
+		Players [4]string `json:"players"`
 	}{}
-	tn := time.Now()
-	his, err := historyByDate(tn)
+	now := time.Now()
+	hiss, err := historyByDate(now)
 	if err != nil {
 		handler.CommonErr(nil, "cannot get history by date!!!")
 	}
-	sort.Slice(his, func(i, j int) bool {
-		resI, err := timestamp.Parse(his[i].InputItem.Timestamp)
-		if err != nil {
-			panic(err)
-		}
-		resJ, err := timestamp.Parse(his[j].InputItem.Timestamp)
-		if err != nil {
-			panic(err)
-		}
-		return resI.After(resJ)
-	})
-	if len(his) == 0 {
+	var lastHis historyItem
+	if len(hiss) == 0 {
 		return handler.CommonErr(nil, "no game today")
 	}
-	res.Players = his[0].InputItem.Players[:]
-	if len(res.Players) != 4 {
-		return handler.CommonErr(nil, "missing player - the number of players is not 4")
+
+	for _, his := range hiss {
+		if lastHis.InputItem.Timestamp == "" {
+			lastHis = his
+		} else {
+			lastHisTs, err := timestamp.Parse(lastHis.InputItem.Timestamp)
+			if err != nil {
+				panic(err)
+			}
+
+			hisTs, err := timestamp.Parse(his.InputItem.Timestamp)
+			if err != nil {
+				return handler.CommonErr(nil, "can not parse timestamp in history")
+			}
+
+			if lastHisTs.Before(hisTs) {
+				lastHis = his
+			}
+		}
 	}
+	res.Players = lastHis.InputItem.Players
+
 	for i, id := range res.Players {
 		if id == "" {
 			return handler.CommonErr(nil, "missing player - player "+strconv.Itoa(i+1)+" is missing")
