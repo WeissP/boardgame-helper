@@ -1,3 +1,21 @@
+* doudizhu
+** input
+**** constrains
+***** the sum of weight must be zero
+
+***** all values must not be empty
+
+***** weight
+
+****** winner is lord
+lord>=3,NonL<0
+
+****** winner is not lord
+lord<0, defense>=1, winner>=2,NonL>0
+**** tie
+
+if all values in weight are zero
+
 * api
 ** notation
 
