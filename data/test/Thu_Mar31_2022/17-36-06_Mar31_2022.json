@@ -8,7 +8,7 @@
   "winner": "xiao",
   "weight": {
     "xiao": 3,
-    "bai": -3,
+    "bai": -4,
     "yunfan": 0,
     "jintian": 1
   },
@@ -19,7 +19,7 @@
   "final_points": {
     "bai": -104,
     "xiao": 68,
-    "jintian": -28,
+    "jintian": 28,
     "yunfan": 8
   },
   "lord": "bai",
