@@ -1,6 +1,7 @@
 package doudizhu
 
 import (
+	"boardgame-helper/middleware/players"
 	"boardgame-helper/router/handler"
 	"boardgame-helper/utils/json"
 	"boardgame-helper/utils/timestamp"
@@ -62,13 +63,19 @@ func (hi *historyItem) toggle(status bool) error {
 
 type historyItems []historyItem
 
-func namesToIDs(name [4]string) (ids [4]string) {
-	return name // delete this line when implementing
-	// _ = players.NameToID(name[0])
-	panic("not implemented") // TODO: Implement
+func IDsToNames(ids [4]string) (names [4]string, err error) {
+	for i, x := range ids {
+		name, e := players.IDToName(x)
+		if e != nil {
+			err = fmt.Errorf("error IDsToNames: %w ", e)
+			return
+		}
+		names[i] = name
+	}
+	return
 }
 
-func (his historyItems) View() (res view) {
+func (his historyItems) View() (res view, err error) {
 	sort.Slice(his, func(i, j int) bool {
 		resI, err := timestamp.Parse(his[i].InputItem.Timestamp)
 		if err != nil {
@@ -83,7 +90,11 @@ func (his historyItems) View() (res view) {
 	if len(his) == 0 {
 		return res
 	} else {
-		res.PlayerNames = namesToIDs(his[0].InputItem.Players) // find function to change ID to Name
+		names, e := IDsToNames(his[0].InputItem.Players) // find function to change ID to Name
+		if e != nil {
+			err = fmt.Errorf("error IDsToNames: %w ", e)
+		}
+		res.PlayerNames = names
 		currentRound := 0
 		for _, item := range his {
 			dpi := DeltaPointsItem{}
