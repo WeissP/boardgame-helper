@@ -24,16 +24,6 @@ type inputItem struct {
 	Lord       string         `json:"lord"`
 }
 
-func TestInput() string {
-	TestStruct := inputItem{"20220405...", 8, 3, [4]string{"bai", "xiao", "jintian", "yunfan"}, 88, "bai", map[string]int{"bai": 1}, "bai"}
-	item, err := json.From(TestStruct)
-	if err != nil {
-		panic(err)
-	} else {
-		return string(item)
-	}
-}
-
 func (ii inputItem) History() (hi historyItem, err error) {
 	hi.InputItem = ii
 	hi.Deltas, err = ii.deltas()
@@ -97,10 +87,16 @@ func (ii inputItem) deltas() (res [4]int, err error) {
 		}
 	}
 	// basic point
-	err = ii.checkWinner()
-	if err != nil {
+	if !exists(ii.Winner, ii.Players) {
+		err = fmt.Errorf("no winner <%s> found in %v", ii.Winner, ii.Players)
 		return
 	}
+
+	if !exists(ii.Lord, ii.Players) {
+		err = fmt.Errorf("no lord <%s> found in %v", ii.Lord, ii.Players)
+		return
+	}
+
 	for i, id := range ii.Players {
 		// lord win
 		if ii.Winner == ii.Lord {
@@ -120,18 +116,13 @@ func (ii inputItem) deltas() (res [4]int, err error) {
 	return
 }
 
-func (ii inputItem) checkWinner() (err error) {
-	existWinner := false
-	for _, id := range ii.Players {
-		if ii.Winner == id {
-			existWinner = true
-			break
+func exists(name string, names [4]string) bool {
+	for _, x := range names {
+		if name == x {
+			return true
 		}
 	}
-	if !existWinner {
-		err = fmt.Errorf("no winner found!!!")
-	}
-	return
+	return false
 }
 
 func (ii inputItem) playerDetails(id, pos string, delta int) playerDetail {

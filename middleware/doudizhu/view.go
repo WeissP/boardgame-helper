@@ -22,15 +22,6 @@ type view struct {
 	FinalPoints [4]int            `json:"finalPoints"`
 }
 
-func JsonToStruct() view {
-	Testview, err := json.ReadFile[view]("test", "Testview.json")
-	if err != nil {
-		panic(err)
-	} else {
-		return Testview
-	}
-}
-
 var currentView view
 
 func (v view) JSON() []byte {
