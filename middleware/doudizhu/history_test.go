@@ -1,28 +1,79 @@
 package doudizhu
 
 import (
-	"boardgame-helper/router/handler"
-	"net/http"
 	"reflect"
 	"testing"
+	"time"
 )
 
-func TestCurPlayers(t *testing.T) {
+func Test_historyItems_filterByDateRange(t *testing.T) {
 	type args struct {
-		w http.ResponseWriter
-		r *http.Request
+		oldest time.Time
+		newest time.Time
 	}
 	tests := []struct {
-		name     string
-		args     args
-		wantHerr handler.Err
+		name    string
+		hiss    historyItems
+		args    args
+		wantRes historyItems
+		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotHerr := CurPlayers(tt.args.w, tt.args.r); !reflect.DeepEqual(gotHerr, tt.wantHerr) {
-				t.Errorf("CurPlayers() = %v, want %v", gotHerr, tt.wantHerr)
+			gotRes, err := tt.hiss.filterByDateRange(tt.args.oldest, tt.args.newest)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("historyItems.filterByDateRange() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotRes, tt.wantRes) {
+				t.Errorf("historyItems.filterByDateRange() = %v, want %v", gotRes, tt.wantRes)
+			}
+		})
+	}
+}
+
+func Test_curHistory(t *testing.T) {
+	tests := []struct {
+		name    string
+		wantHis historyItems
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotHis, err := curHistory()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("curHistory() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotHis, tt.wantHis) {
+				t.Errorf("curHistory() = %v, want %v", gotHis, tt.wantHis)
+			}
+		})
+	}
+}
+
+func Test_historyItems_lastPlayers(t *testing.T) {
+	tests := []struct {
+		name    string
+		his     historyItems
+		wantRes [4]string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotRes, err := tt.his.lastPlayers()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("historyItems.lastPlayers() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotRes, tt.wantRes) {
+				t.Errorf("historyItems.lastPlayers() = %v, want %v", gotRes, tt.wantRes)
 			}
 		})
 	}

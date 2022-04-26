@@ -5,6 +5,7 @@ import (
 	"boardgame-helper/router/handler"
 	"boardgame-helper/utils/json"
 	"boardgame-helper/utils/timestamp"
+	"errors"
 	"fmt"
 	"net/http"
 	"sort"
@@ -130,6 +131,68 @@ func (his historyItems) write() {
 	}
 }
 
+func (his historyItems) lastPlayers() (res [4]string, err error) {
+	if len(his) == 0 {
+		err = errors.New("no history item can be found")
+		return
+	}
+	var lastHi historyItem
+	for _, hi := range his {
+		if lastHi.InputItem.Timestamp == "" {
+			lastHi = hi
+		} else {
+			lastHiTs, err := timestamp.Parse(lastHi.InputItem.Timestamp)
+			if err != nil {
+				panic(err)
+			}
+
+			hiTs, err := timestamp.Parse(hi.InputItem.Timestamp)
+			if err != nil {
+				err = fmt.Errorf("can not parse timestamp in history:%v", hi)
+			}
+
+			if lastHiTs.Before(hiTs) {
+				lastHi = hi
+			}
+		}
+	}
+	res = lastHi.InputItem.Players
+	return
+}
+
+// filter applies pred to each element in his, if the returned value is true, then add it to res.
+// if error is not nil, the loop will be immediately terminated, and this error will be returned.
+func (his historyItems) filter(pred func(historyItem) (bool, error)) (res historyItems, err error) {
+	for _, hi := range his {
+		ok, e := pred(hi)
+		if e != nil {
+			err = fmt.Errorf("error in filter:%w", err)
+			return
+		}
+		if ok {
+			res = append(res, hi)
+		}
+	}
+	return
+}
+
+// filterByDateRange only returns the historyItems in his that their timestamp are between oldest and newest.
+func (his historyItems) filterByDateRange(from, to time.Time) (res historyItems, err error) {
+	if from.After(to) {
+		err = fmt.Errorf("the oldest timestamp [%v] is newer than the newest [%v]!", from.String(), to.String())
+		return
+	}
+	pred := func(hi historyItem) (ok bool, err error) {
+		t, err := timestamp.Parse(hi.InputItem.Timestamp)
+		if err != nil {
+			return false, fmt.Errorf("the timestamp in histroy <%v> can not be parsed: %w", hi, err)
+		}
+		ok = !t.Before(from) && !t.After(to)
+		return
+	}
+	return his.filter(pred)
+}
+
 func historyByDate(t time.Time) (hi historyItems, err error) {
 	date := timestamp.Date(t)
 	hi, err = json.ReadDir[historyItem]("history", date)
@@ -147,6 +210,16 @@ func historyByDateTime(t time.Time) (hi historyItem, err error) {
 		err = fmt.Errorf("cannot read from json file!!! %w", err)
 	}
 	return
+}
+
+// historyByDateRange returns all historyItems between the given range.
+func historyByDateRange(from, to time.Time) (his historyItems, err error) {
+	panic("not implemented") // TODO: Implement
+}
+
+// curHistory returns all today's historyItems, if now is earlier 4 o'clock, also returns yestoday's historyItems.
+func curHistory() (his historyItems, err error) {
+	panic("not implemented") // TODO: Implement
 }
 
 func ToggleHistory(status bool) func(w http.ResponseWriter, r *http.Request) handler.Err {
@@ -173,46 +246,23 @@ func ToggleHistory(status bool) func(w http.ResponseWriter, r *http.Request) han
 }
 
 func CurPlayers(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
-	res := struct {
-		Players [4]string `json:"players"`
-	}{}
-	now := time.Now()
-	hiss, err := historyByDate(now)
+	his, err := curHistory()
 	if err != nil {
-		handler.CommonErr(nil, "cannot get history by date!!!")
+		return handler.CommonErr(nil, "cannot get current history")
 	}
-	var lastHis historyItem
-	if len(hiss) == 0 {
-		return handler.CommonErr(nil, "no game today")
+	players, err := his.lastPlayers()
+	if err != nil {
+		return handler.CommonErr(err, "cannot find last players")
 	}
 
-	for _, his := range hiss {
-		if lastHis.InputItem.Timestamp == "" {
-			lastHis = his
-		} else {
-			lastHisTs, err := timestamp.Parse(lastHis.InputItem.Timestamp)
-			if err != nil {
-				panic(err)
-			}
-
-			hisTs, err := timestamp.Parse(his.InputItem.Timestamp)
-			if err != nil {
-				return handler.CommonErr(nil, "can not parse timestamp in history")
-			}
-
-			if lastHisTs.Before(hisTs) {
-				lastHis = his
-			}
-		}
-	}
-	res.Players = lastHis.InputItem.Players
-
-	for i, id := range res.Players {
+	for i, id := range players {
 		if id == "" {
 			return handler.CommonErr(nil, "missing player - player "+strconv.Itoa(i+1)+" is missing")
 		}
 	}
-	j, err := json.From(res)
+	j, err := json.From(struct {
+		Players [4]string `json:"players"`
+	}{players})
 	if err != nil {
 		return handler.CommonErr(err, "can not convert players to JSON")
 	}

@@ -24,6 +24,11 @@ type inputItem struct {
 	Lord       string         `json:"lord"`
 }
 
+func (ii inputItem) isTie() bool {
+	// check if all values in weight are zero
+	panic("not implemented") // TODO: Implement
+}
+
 func (ii inputItem) History() (hi historyItem, err error) {
 	hi.InputItem = ii
 	hi.Deltas, err = ii.deltas()
