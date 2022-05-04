@@ -217,8 +217,8 @@ func historyByDateRange(from, to time.Time) (his historyItems, err error) {
 	panic("not implemented") // TODO: Implement
 }
 
-// curHistory returns all today's historyItems, if now is earlier 4 o'clock, also returns yestoday's historyItems.
-func curHistory() (his historyItems, err error) {
+// relatedHistory returns historyItems related to the given t, if t is earlier than 4 o'clock, also returns historyItems one day before t.
+func relatedHistory(t time.Time) (his historyItems, err error) {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -246,7 +246,7 @@ func ToggleHistory(status bool) func(w http.ResponseWriter, r *http.Request) han
 }
 
 func CurPlayers(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
-	his, err := curHistory()
+	his, err := relatedHistory(time.Now())
 	if err != nil {
 		return handler.CommonErr(nil, "cannot get current history")
 	}

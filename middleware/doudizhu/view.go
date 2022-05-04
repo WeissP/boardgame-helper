@@ -6,6 +6,7 @@ import (
 	"boardgame-helper/utils/timestamp"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 type DeltaPointsItem struct {
@@ -67,7 +68,7 @@ func Update(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 }
 
 func updateCurView() error {
-	his, err := curHistory()
+	his, err := relatedHistory(time.Now())
 	if err != nil {
 		return err
 	}
