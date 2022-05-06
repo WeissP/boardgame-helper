@@ -25,12 +25,79 @@ type inputItem struct {
 }
 
 func (ii inputItem) isTie() bool {
-	// check if all values in weight are zero
-	panic("not implemented") // TODO: Implement
+	for _, x := range ii.Weight {
+		if x != 0 {
+			return false
+		}
+	}
+	return true
 }
 
+func (ii inputItem) empty() bool {
+	for _, x := range ii.Players {
+		if x == "" {
+			return false
+		}
+	}
+	return true
+}
+
+func constrain(ii inputItem) (err error) {
+	//sum may have some parameter safety problem.
+	sum := 0
+	for _, x := range ii.Weight {
+		sum += x
+	}
+	if sum != 0 {
+		return fmt.Errorf("the sum of weight must be zero")
+	}
+
+	if !ii.empty() {
+		return fmt.Errorf("Players must not be empty")
+	}
+
+	if ii.isTie() {
+		return nil
+	}
+
+	// winner is lord
+	// lord>=3,NonL<0
+	if ii.Lord == ii.Winner {
+		for i, x := range ii.Weight {
+			if i != ii.Lord && x >= 0 || i == ii.Lord && x < 3 {
+				return fmt.Errorf("weight not correct")
+			}
+		}
+		// winner is not lord
+		// lord<0, defense>=1, winner>=2,NonL>0
+	} else {
+		p, err := ii.position()
+		if err != nil {
+			return fmt.Errorf("can not generate position: %v", err)
+		}
+
+		for i, x := range ii.Weight {
+			if i == ii.Lord && x >= 0 || p[i] == "defense" && x < 1 {
+				return fmt.Errorf("weight not correct")
+			}
+
+			if i == ii.Winner && x < 2 || i != ii.Lord && x <= 0 {
+				return fmt.Errorf("weight not correct")
+			}
+		}
+
+	}
+
+	return nil
+}
 func (ii inputItem) History() (hi historyItem, err error) {
 	hi.InputItem = ii
+
+	err = constrain(ii)
+	if err != nil {
+		return
+	}
+
 	hi.Deltas, err = ii.deltas()
 	if err != nil {
 		return
@@ -72,6 +139,10 @@ func (ii inputItem) position() (res map[string]string, err error) {
 }
 
 func (ii inputItem) deltas() (res [4]int, err error) {
+	if ii.isTie() {
+		return
+	}
+
 	lordWeight := ii.Weight[ii.Lord]
 	weightSum := 0
 	for _, weight := range ii.Weight {
