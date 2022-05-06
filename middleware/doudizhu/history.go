@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"sort"
 	"strconv"
 	"time"
@@ -72,6 +73,13 @@ func IDsToNames(ids [4]string) (names [4]string, err error) {
 			return
 		}
 		names[i] = name
+	}
+	return
+}
+
+func (his historyItems) timestamps() (res []string) {
+	for _, x := range his {
+		res = append(res, x.InputItem.Timestamp)
 	}
 	return
 }
@@ -213,41 +221,38 @@ func historyByDateTime(t time.Time) (hi historyItem, err error) {
 }
 
 // historyByDateRange returns all historyItems between the given range.
-func historyByDateRange(from, to time.Time) (his historyItems, err error) {
-	//wenn the times between tow dates are over 1 day, the function will
-	//not be able to generate the history from the date between
-	dateFrom := timestamp.Date(from)
-	dateTo := timestamp.Date(to)
-	his, err = json.ReadDir[historyItem]("history", dateFrom)
-	if err != nil {
-		err = fmt.Errorf("cannot read from json file!!! %w", err)
+func historyByDateRange(from, to time.Time) (historyItems, error) {
+	if from.After(to) {
+		return nil, fmt.Errorf("from [%v] is older than to [%v]", from, to)
 	}
 
-	if dateFrom != dateTo {
-		hisTo, err := json.ReadDir[historyItem]("history", dateTo)
-		if err != nil {
-			err = fmt.Errorf("cannot read from json file!!! %w", err)
+	var res []historyItem
+	for cur := from; !cur.After(to); cur = cur.AddDate(0, 0, 1) {
+		curDate := timestamp.Date(cur)
+		his, err := json.ReadDir[historyItem]("history", curDate)
+		// ignore the error that dir not exists
+		if err != nil && !os.IsNotExist(err) {
+			return nil, fmt.Errorf("cannot read history on %v: %w", curDate, err)
 		}
-		his = append(his, hisTo...)
+		res = append(res, his...)
 	}
-	return
+	filteredRes, err := historyItems(res).filterByDateRange(from, to)
+	if err != nil {
+		return nil, fmt.Errorf("can not find history by date range:%w", err)
+	}
+	return filteredRes, nil
 }
 
 // relatedHistory returns historyItems related to the given t, if t is earlier than 4 o'clock, also returns historyItems one day before t.
 func relatedHistory(t time.Time) (his historyItems, err error) {
-	dateTime := timestamp.DateTime(t)
-	if []byte(dateTime)[0] == 0 && []byte(dateTime)[1] < 4 {
-		tBefore := t.AddDate(0, 0, -1)
-		his, err = historyByDateRange(tBefore, t)
-		if err != nil {
-			err = fmt.Errorf("cannot read from json file!!! %w", err)
-		}
-		return
+	if t.Hour() <= 4 {
+		his, err = historyByDateRange(t.AddDate(0, 0, -1), t)
+	} else {
+		his, err = historyByDate(t)
 	}
 
-	his, err = historyByDate(t)
 	if err != nil {
-		err = fmt.Errorf("cannot read from json file!!! %w", err)
+		err = fmt.Errorf("error in relatedHistory: %w", err)
 	}
 	return
 }

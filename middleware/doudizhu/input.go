@@ -43,7 +43,7 @@ func (ii inputItem) valid() bool {
 }
 
 func constrain(ii inputItem) (err error) {
-	//sum may have some parameter safety problem.
+	// sum may have some parameter safety problem.
 	sum := 0
 	for _, x := range ii.Weight {
 		sum += x
@@ -65,7 +65,7 @@ func constrain(ii inputItem) (err error) {
 	if ii.Lord == ii.Winner {
 		for id, w := range ii.Weight {
 			switch {
-			case id != ii.Lord && w >= 0:
+			case id != ii.Lord && w > 0:
 				return fmt.Errorf("the peasant %s loss, his weight should under 0", id)
 			case id == ii.Lord && w < 3:
 				return fmt.Errorf("the lord %s win, his weight should be over/equal 3", id)
@@ -87,27 +87,29 @@ func constrain(ii inputItem) (err error) {
 				return fmt.Errorf("the defender %s win, his weight should be over/equal 1", id)
 			case id == ii.Winner && w < 2:
 				return fmt.Errorf("the peasant %s win, his weight should be over/equal 2", id)
-			case id != ii.Lord && w <= 0:
+			case id != ii.Lord && w < 0:
 				return fmt.Errorf("the peasant %s win, his weight should be over/equal 0", id)
 
 			}
-
 		}
 
 	}
 
 	return nil
 }
+
 func (ii inputItem) History() (hi historyItem, err error) {
 	hi.InputItem = ii
 
 	err = constrain(ii)
 	if err != nil {
+		err = fmt.Errorf("can not add input item {%+v}:%w", ii, err)
 		return
 	}
 
 	hi.Deltas, err = ii.deltas()
 	if err != nil {
+		err = fmt.Errorf("can not add input item {%+v}:%w", ii, err)
 		return
 	}
 
@@ -115,6 +117,7 @@ func (ii inputItem) History() (hi historyItem, err error) {
 
 	positionMap, err := ii.position()
 	if err != nil {
+		err = fmt.Errorf("can not add input item {%+v}:%w", ii, err)
 		return
 	}
 
