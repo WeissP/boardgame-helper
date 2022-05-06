@@ -33,7 +33,7 @@ func (ii inputItem) isTie() bool {
 	return true
 }
 
-func (ii inputItem) empty() bool {
+func (ii inputItem) valid() bool {
 	for _, x := range ii.Players {
 		if x == "" {
 			return false
@@ -52,7 +52,7 @@ func constrain(ii inputItem) (err error) {
 		return fmt.Errorf("the sum of weight must be zero")
 	}
 
-	if !ii.empty() {
+	if !ii.valid() {
 		return fmt.Errorf("Players must not be empty")
 	}
 
@@ -63,9 +63,12 @@ func constrain(ii inputItem) (err error) {
 	// winner is lord
 	// lord>=3,NonL<0
 	if ii.Lord == ii.Winner {
-		for i, x := range ii.Weight {
-			if i != ii.Lord && x >= 0 || i == ii.Lord && x < 3 {
-				return fmt.Errorf("weight not correct")
+		for id, w := range ii.Weight {
+			switch {
+			case id != ii.Lord && w >= 0:
+				return fmt.Errorf("the peasant %s loss, his weight should under 0", id)
+			case id == ii.Lord && w < 3:
+				return fmt.Errorf("the lord %s win, his weight should be over/equal 3", id)
 			}
 		}
 		// winner is not lord
@@ -73,17 +76,22 @@ func constrain(ii inputItem) (err error) {
 	} else {
 		p, err := ii.position()
 		if err != nil {
-			return fmt.Errorf("can not generate position: %v", err)
+			return fmt.Errorf("can not generate position: %w", err)
 		}
 
-		for i, x := range ii.Weight {
-			if i == ii.Lord && x >= 0 || p[i] == "defense" && x < 1 {
-				return fmt.Errorf("weight not correct")
+		for id, w := range ii.Weight {
+			switch {
+			case id == ii.Lord && w >= 0:
+				return fmt.Errorf("the lord %s loss, his weight should be under 0", id)
+			case p[id] == "defense" && w < 1:
+				return fmt.Errorf("the defender %s win, his weight should be over/equal 1", id)
+			case id == ii.Winner && w < 2:
+				return fmt.Errorf("the peasant %s win, his weight should be over/equal 2", id)
+			case id != ii.Lord && w <= 0:
+				return fmt.Errorf("the peasant %s win, his weight should be over/equal 0", id)
+
 			}
 
-			if i == ii.Winner && x < 2 || i != ii.Lord && x <= 0 {
-				return fmt.Errorf("weight not correct")
-			}
 		}
 
 	}
@@ -246,7 +254,7 @@ func EditInput(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	r.ParseForm()
 	tsStr := r.Form.Get("timestamp")
 	if tsStr == "" {
-		return handler.CommonErr(nil, "timestamp is empty")
+		return handler.CommonErr(nil, "timestamp is valid")
 	}
 	ts, err := timestamp.Parse(tsStr)
 	if err != nil {
