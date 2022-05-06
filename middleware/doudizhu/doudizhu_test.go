@@ -88,7 +88,7 @@ func testToHistory() {
 		req := newPostReq("/api/doudizhu/new", jsf)
 		_, herr := response(req, AddInput)
 		if !herr.Empty() {
-			panic(herr.Message)
+			panic(fmt.Errorf("%s:%w", herr.Message, herr.Error))
 		}
 
 	}
