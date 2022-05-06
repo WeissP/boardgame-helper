@@ -118,6 +118,7 @@ const DouDiZhuInput = ({ timestamp }) => {
                 navigate('/doudizhu-view')
             }
         }).catch(function(error) {
+            console.log(error)
             if (error.response) {
                 window.alert(error.response.data)
             }

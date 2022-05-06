@@ -26,6 +26,14 @@ func ParseWithDft(b []byte, t any) error {
 	return json.Unmarshal(b, t)
 }
 
+func SetRootPath(p string) error {
+	if root == "" {
+		root = p
+		return nil
+	}
+	return fmt.Errorf("root has already been set with value:%v", root)
+}
+
 func InitConfig(configJson, dftHost, dftPort string) (host, port string) {
 	config := struct{ Host, Port, Dir string }{dftHost, dftPort, ""}
 	err := ParseWithDft([]byte(configJson), &config)

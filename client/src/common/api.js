@@ -1,14 +1,12 @@
 import data from '../config.json'
 import axios from 'axios'
 
-const url = 'http://' + data.Host + ':' + data.Port + '/api/'
-
 export function post(endpoint, data) {
-    return axios.post(url + endpoint, data)
+    return axios.post('/api/' + endpoint, data)
 }
 
 export function get(endpoint, data) {
-    return axios.get(url + endpoint, { params: data })
+    return axios.get('/api/' + endpoint)
 }
 
 // class TestV extends React.Component {

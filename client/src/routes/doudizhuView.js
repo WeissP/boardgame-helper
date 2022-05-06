@@ -18,11 +18,11 @@ import { get, post } from '../common/api'
 import { useNavigate } from 'react-router-dom'
 
 function enable(timestamp) {
-    get('/doudizhu/enable', { timestamp: timestamp })
+    get('doudizhu/enable', { timestamp: timestamp })
 }
 
 function disable(timestamp) {
-    get('/doudizhu/disable', { timestamp: timestamp })
+    get('doudizhu/disable', { timestamp: timestamp })
 }
 
 const DisabledItem = ({ deltas, readOnly, timestamp, hide }) => {
@@ -43,7 +43,7 @@ const DisabledItem = ({ deltas, readOnly, timestamp, hide }) => {
                             <button class='pr-2' onClick={_ => enable(timestamp)}>
                                 <MdAddCircleOutline />
                             </button>
-                            <button onClick={_ => navigate('/doudizhu-edit/' + encodeURIComponent(timestamp))}>
+                            <button onClick={_ => navigate('doudizhu-edit/' + encodeURIComponent(timestamp))}>
                                 <MdModeEdit />
                             </button>
                         </ButtonGroup>}
@@ -87,7 +87,7 @@ const EnabledItem = ({ deltas, readOnly, timestamp, rnd }) => {
 }
 
 async function updateView() {
-    await get('/doudizhu/view/update').catch(e => console.log('can not update view'))
+    await get('doudizhu/view/update').catch(e => console.log('can not update view'))
 }
 
 const DouDiZhuView = () => {
@@ -106,7 +106,7 @@ const DouDiZhuView = () => {
     }
 
     async function getData() {
-        const resp = await get('/doudizhu/view/now')
+        const resp = await get('doudizhu/view/now')
         if (!isEmpty(resp.data)) {
             setData(resp.data)
         }
