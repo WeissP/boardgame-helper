@@ -214,12 +214,42 @@ func historyByDateTime(t time.Time) (hi historyItem, err error) {
 
 // historyByDateRange returns all historyItems between the given range.
 func historyByDateRange(from, to time.Time) (his historyItems, err error) {
-	panic("not implemented") // TODO: Implement
+	//wenn the times between tow dates are over 1 day, the function will
+	//not be able to generate the history from the date between
+	dateFrom := timestamp.Date(from)
+	dateTo := timestamp.Date(to)
+	his, err = json.ReadDir[historyItem]("history", dateFrom)
+	if err != nil {
+		err = fmt.Errorf("cannot read from json file!!! %w", err)
+	}
+
+	if dateFrom != dateTo {
+		hisTo, err := json.ReadDir[historyItem]("history", dateTo)
+		if err != nil {
+			err = fmt.Errorf("cannot read from json file!!! %w", err)
+		}
+		his = append(his, hisTo...)
+	}
+	return
 }
 
 // relatedHistory returns historyItems related to the given t, if t is earlier than 4 o'clock, also returns historyItems one day before t.
 func relatedHistory(t time.Time) (his historyItems, err error) {
-	panic("not implemented") // TODO: Implement
+	dateTime := timestamp.DateTime(t)
+	if []byte(dateTime)[0] == 0 && []byte(dateTime)[1] < 4 {
+		tBefore := t.AddDate(0, 0, -1)
+		his, err = historyByDateRange(tBefore, t)
+		if err != nil {
+			err = fmt.Errorf("cannot read from json file!!! %w", err)
+		}
+		return
+	}
+
+	his, err = historyByDate(t)
+	if err != nil {
+		err = fmt.Errorf("cannot read from json file!!! %w", err)
+	}
+	return
 }
 
 func ToggleHistory(status bool) func(w http.ResponseWriter, r *http.Request) handler.Err {

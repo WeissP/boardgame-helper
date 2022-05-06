@@ -254,7 +254,7 @@ func EditInput(w http.ResponseWriter, r *http.Request) (herr handler.Err) {
 	r.ParseForm()
 	tsStr := r.Form.Get("timestamp")
 	if tsStr == "" {
-		return handler.CommonErr(nil, "timestamp is valid")
+		return handler.CommonErr(nil, "timestamp is empty")
 	}
 	ts, err := timestamp.Parse(tsStr)
 	if err != nil {
