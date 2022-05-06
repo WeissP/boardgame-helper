@@ -6,42 +6,31 @@ import (
 )
 
 func Test_inputItem_position(t *testing.T) {
-	type fields struct {
-		Timestamp  string
-		Stake      int
-		BonusTiles int
-		Players    [4]string
-		RawPoints  int
-		Winner     string
-		Weight     map[string]int
-		Lord       string
+	genInputItem := func(players [4]string, lord string) (ii inputItem) {
+		ii.Players = players
+		ii.Lord = lord
+		return
 	}
 	tests := []struct {
 		name    string
-		fields  fields
-		wantRes map[string]string
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
+		players [4]string
+		lord    string
+		wantRes [4]string // the same order as posArray in input.go
+	}{{
+		"test func postion in inputItem",
+		[4]string{"a", "b", "c", "d"},
+		"b",
+		[4]string{"b", "c", "d", "a"},
+	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ii := inputItem{
-				Timestamp:  tt.fields.Timestamp,
-				Stake:      tt.fields.Stake,
-				BonusTiles: tt.fields.BonusTiles,
-				Players:    tt.fields.Players,
-				RawPoints:  tt.fields.RawPoints,
-				Winner:     tt.fields.Winner,
-				Weight:     tt.fields.Weight,
-				Lord:       tt.fields.Lord,
+			ii := genInputItem(tt.players, tt.lord)
+			wantResMap := map[string]string{}
+			for i, id := range tt.wantRes {
+				wantResMap[id] = posArray[i]
 			}
-			gotRes, err := ii.position()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("inputItem.position() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotRes, tt.wantRes) {
+			gotRes, _ := ii.position()
+			if !reflect.DeepEqual(gotRes, wantResMap) {
 				t.Errorf("inputItem.position() = %v, want %v", gotRes, tt.wantRes)
 			}
 		})

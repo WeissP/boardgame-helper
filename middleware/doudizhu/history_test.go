@@ -1,77 +1,158 @@
 package doudizhu
 
 import (
+	"boardgame-helper/utils/json"
+	"boardgame-helper/utils/timestamp"
 	"reflect"
 	"testing"
 	"time"
 )
 
 func Test_historyItems_filterByDateRange(t *testing.T) {
+	initTest()
 	type args struct {
 		oldest time.Time
 		newest time.Time
+	}
+	oldT, err1 := timestamp.Parse("2022-04-20T17:31:12.768Z")
+	if err1 != nil {
+		t.Errorf("error in case generation: cannot parse tring to ts: oldest")
+	}
+	newT, err2 := timestamp.Parse("2022-04-20T17:31:32.768Z")
+	if err2 != nil {
+		t.Errorf("error in case generation: cannot parse tring to ts: newest")
+	}
+	hiss, err := json.ReadDir[historyItem]("history", "Wed_Apr_20_2022")
+	if err != nil {
+		t.Errorf("error in case generation: cannot read data dir")
 	}
 	tests := []struct {
 		name    string
 		hiss    historyItems
 		args    args
 		wantRes historyItems
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
+	}{{
+		name: "Test function filterByDateRange in historyItems",
+		hiss: hiss,
+		args: args{oldest: oldT, newest: newT},
+		wantRes: []historyItem{
+			historyItem{
+				InputItem: inputItem{Timestamp: "2022-04-20T17:31:22.768Z",
+					Stake:      3,
+					BonusTiles: 8,
+					Players:    [4]string{"yunfan", "xiao", "bai", "jintian"},
+					RawPoints:  25,
+					Winner:     "xiao",
+					Weight:     map[string]int{"bai": 0, "jintian": 0, "xiao": 3, "yunfan": -3},
+					Lord:       "xiao"},
+				Deltas:  [4]int{-83, 99, -8, -8},
+				Enabled: true,
+				PlayerDetails: [4]playerDetail{
+					playerDetail{Player: "yunfan",
+						Timestamp:   "2022-04-20T17:31:22.768Z",
+						Stake:       3,
+						BonusTiles:  8,
+						Lord:        false,
+						Weight:      -3,
+						Winner:      "xiao",
+						Rawpoints:   25,
+						Deltapoints: -83,
+						Position:    "defense",
+						Enabled:     true},
+					playerDetail{Player: "xiao",
+						Timestamp:   "2022-04-20T17:31:22.768Z",
+						Stake:       3,
+						BonusTiles:  8,
+						Lord:        true,
+						Weight:      3,
+						Winner:      "xiao",
+						Rawpoints:   25,
+						Deltapoints: 99,
+						Position:    "lord",
+						Enabled:     true},
+					playerDetail{Player: "bai",
+						Timestamp:   "2022-04-20T17:31:22.768Z",
+						Stake:       3,
+						BonusTiles:  8,
+						Lord:        false,
+						Weight:      0,
+						Winner:      "xiao",
+						Rawpoints:   25,
+						Deltapoints: -8,
+						Position:    "support",
+						Enabled:     true},
+					playerDetail{Player: "jintian",
+						Timestamp:   "2022-04-20T17:31:22.768Z",
+						Stake:       3,
+						BonusTiles:  8,
+						Lord:        false,
+						Weight:      0,
+						Winner:      "xiao",
+						Rawpoints:   25,
+						Deltapoints: -8,
+						Position:    "carry",
+						Enabled:     true}}}},
+	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := tt.hiss.filterByDateRange(tt.args.oldest, tt.args.newest)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("historyItems.filterByDateRange() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			gotRes, _ := tt.hiss.filterByDateRange(tt.args.oldest, tt.args.newest)
 			if !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("historyItems.filterByDateRange() = %v, want %v", gotRes, tt.wantRes)
+				t.Errorf("\ngot: %v \nwant: %v", gotRes, tt.wantRes)
 			}
 		})
 	}
 }
 
-func Test_curHistory(t *testing.T) {
-	tests := []struct {
-		name    string
-		wantHis historyItems
-		wantErr bool
-	}{
-		// TODO: Add test cases.
+func Test_relatedHistory(t *testing.T) {
+	initTest()
+	time1, err1 := timestamp.Parse("2022-04-20T17:31:12.768Z")
+	if err1 != nil {
+		t.Errorf("error in case generation: cannot parse tring to ts: oldest")
 	}
+	time2, err2 := timestamp.Parse("2022-04-21T02:31:12.768Z")
+	if err2 != nil {
+		t.Errorf("error in case generation: cannot parse tring to ts: oldest")
+	}
+	hiss, err := json.ReadDir[historyItem]("history", "Wed_Apr_20_2022")
+	if err != nil {
+		t.Errorf("error in case generation: cannot read data dir")
+	}
+	tests := []struct {
+		name     string
+		relatedT time.Time
+		wantHis  historyItems
+	}{{"ts:2022-04-20T17:31:12.768Z",
+		time1,
+		hiss,
+	}, {"ts:2022-04-20T02:31:12.768Z",
+		time2,
+		hiss}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotHis, err := curHistory()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("curHistory() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			gotHis, _ := relatedHistory(tt.relatedT)
 			if !reflect.DeepEqual(gotHis, tt.wantHis) {
-				t.Errorf("curHistory() = %v, want %v", gotHis, tt.wantHis)
+				t.Errorf("relatedHistory() = %v, want %v", gotHis, tt.wantHis)
 			}
 		})
 	}
 }
 
 func Test_historyItems_lastPlayers(t *testing.T) {
+	initTest()
+	hiss, err := json.ReadDir[historyItem]("history", "Wed_Apr_20_2022")
+	if err != nil {
+		t.Errorf("error in case generation: cannot read data dir")
+	}
 	tests := []struct {
 		name    string
 		his     historyItems
 		wantRes [4]string
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
+	}{{"Wed_Apr_20_2022",
+		hiss,
+		[4]string{"yunfan", "xiao", "bai", "jintian"}}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := tt.his.lastPlayers()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("historyItems.lastPlayers() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			gotRes, _ := tt.his.lastPlayers()
 			if !reflect.DeepEqual(gotRes, tt.wantRes) {
 				t.Errorf("historyItems.lastPlayers() = %v, want %v", gotRes, tt.wantRes)
 			}
