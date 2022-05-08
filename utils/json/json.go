@@ -92,7 +92,7 @@ func ReadDir[T any](pathSegments ...string) (res []T, err error) {
 
 func write(data []byte, filename string, append bool) (err error) {
 	if !writable {
-		return
+		return errors.New("writable == false!")
 	}
 	if !append && isExist(filename) {
 		os.Remove(filename)
