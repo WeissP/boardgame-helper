@@ -18,14 +18,6 @@ const defaultOption = {
     bonusTiles: 3
 }
 
-// function getOption(timestamp) {
-//     if (timestamp == '') {
-//         return defaultOption
-//     } else {
-
-//     }
-// }
-
 async function curPlayers() {
     get('/doudizhu/curPlayers').then((response) => {
         return response.data.players

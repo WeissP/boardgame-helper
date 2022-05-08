@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { Navbar, Nav, Dropdown } from 'rsuite'
 import { useNavigate } from 'react-router-dom'
-import { MdLeaderboard, MdClose, MdViewHeadline, MdOutlineHistory, MdOutlineEditRoad } from 'react-icons/md'
-import logo from './dice.png'
 import EditIcon from '@rsuite/icons/Edit'
 import DashboardIcon from '@rsuite/icons/Dashboard'
 

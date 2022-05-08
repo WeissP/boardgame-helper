@@ -10,10 +10,8 @@ import {
     MdVisibilityOff,
     MdRefresh
 } from 'react-icons/md'
-import { Edit } from '@rsuite/icons'
 import '../App.css'
 import Header from '../navbar/navbar'
-import data from './data.json'
 import { get, post } from '../common/api'
 import { useNavigate } from 'react-router-dom'
 

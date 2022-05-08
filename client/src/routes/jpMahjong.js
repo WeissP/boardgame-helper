@@ -1,13 +1,7 @@
 import '../App.css'
 import React, { useEffect } from 'react'
-import { get, post } from '../common/api'
-import { updateArray, objectMap } from '../common/misc'
-import { PlayerList, INum, UserList } from '../common/input'
 import { Stack, InputNumber, Divider, Checkbox, CheckboxGroup, Panel, PanelGroup, Radio, RadioGroup } from 'rsuite'
 import Header from '../navbar/navbar'
-import { playerValue, playersArray } from '../common/players'
-import { useParams, useNavigate } from 'react-router-dom'
-import { setMinutes } from 'rsuite/esm/utils/dateUtils'
 import ArrowRightIcon from '@rsuite/icons/ArrowRight'
 
 const MainZi = ({ idx, setFu }) => {
