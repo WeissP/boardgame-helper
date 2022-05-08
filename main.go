@@ -3,60 +3,27 @@ package main
 import (
 	"boardgame-helper/middleware/players"
 	"boardgame-helper/router"
+	"boardgame-helper/router/handler"
 	"boardgame-helper/utils/json"
+	"embed"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"path"
-	"path/filepath"
 	"time"
 
 	_ "embed"
 )
 
-type spaHandler struct {
-	staticPath string
-	indexPath  string
-}
-
-func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// get the absolute path to prevent directory traversal
-	path, err := filepath.Abs(r.URL.Path)
-	if err != nil {
-		// if we failed to get the absolute path respond with a 400 bad request
-		// and stop
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// prepend the path with the path to the static directory
-	path = filepath.Join(h.staticPath, path)
-
-	// check whether a file exists at the given path
-	_, err = os.Stat(path)
-	if os.IsNotExist(err) {
-		// file does not exist, serve index.html
-		http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
-		return
-	} else if err != nil {
-		fmt.Printf("can not find file:%v\n", err)
-		// if we got an error (that wasn't that the file doesn't exist) stating the
-		// file, return a 500 internal server error and stop
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// otherwise, use http.FileServer to serve the static dir
-	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
-}
-
 //go:embed config.json
 var configJson []byte
 
+//go:embed client/build
+var client embed.FS
+
 func main() {
 	argPath := flag.String("path", "", "the path to the program")
+	argWritable := flag.Bool("writable", true, "if config files can be written")
 	flag.Parse()
 	dataPath := *argPath
 	if dataPath == "" {
@@ -74,6 +41,7 @@ func main() {
 	log.Printf("The program path is: %s", dataPath)
 
 	json.SetRootPath(path.Join(dataPath, "data"))
+	json.SetWritable(*argWritable)
 
 	err := players.Import()
 	if err != nil {
@@ -82,7 +50,7 @@ func main() {
 
 	r := router.Router()
 
-	spa := spaHandler{staticPath: path.Join(dataPath, "client", "build"), indexPath: "index.html"}
+	spa := handler.New(client)
 	r.PathPrefix("/").Handler(spa)
 
 	srv := &http.Server{

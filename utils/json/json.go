@@ -12,6 +12,7 @@ import (
 
 // the path of directory "data"
 var root string
+var writable bool
 
 func From(s any) ([]byte, error) {
 	return json.Marshal(s)
@@ -24,6 +25,10 @@ func Parse[T any](b []byte) (t T, err error) {
 
 func ParseWithDft(b []byte, t any) error {
 	return json.Unmarshal(b, t)
+}
+
+func SetWritable(b bool) {
+	writable = b
 }
 
 func SetRootPath(p string) error {
@@ -86,6 +91,9 @@ func ReadDir[T any](pathSegments ...string) (res []T, err error) {
 }
 
 func write(data []byte, filename string, append bool) (err error) {
+	if !writable {
+		return
+	}
 	if !append && isExist(filename) {
 		os.Remove(filename)
 	}

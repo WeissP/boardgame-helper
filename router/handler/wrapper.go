@@ -37,6 +37,7 @@ func NoImplementErr() Err {
 func Wrap(fn func(http.ResponseWriter, *http.Request) Err) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if e := fn(w, r); !e.Empty() {
+			fmt.Printf("%v\n", e)
 			http.Error(w, e.String(), e.Code)
 		}
 	}
