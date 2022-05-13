@@ -41,7 +41,7 @@ const DisabledItem = ({ deltas, readOnly, timestamp, hide }) => {
                             <button class='pr-2' onClick={_ => enable(timestamp)}>
                                 <MdAddCircleOutline />
                             </button>
-                            <button onClick={_ => navigate('doudizhu-edit/' + encodeURIComponent(timestamp))}>
+                            <button onClick={_ => navigate('/doudizhu-edit/' + encodeURIComponent(timestamp))}>
                                 <MdModeEdit />
                             </button>
                         </ButtonGroup>}
